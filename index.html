@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -26,6 +25,8 @@
         }
 
         html[data-theme='dark'] {
+            --primary-color: #4dabf7; /* Lighter blue for dark mode contrast */
+            --primary-hover: #74c0fc;
             --light-bg: #212529;
             --dark-bg: #f8f9fa;
             --text-color-light: #f8f9fa;
@@ -43,7 +44,6 @@
         body {
             font-family: var(--font-family);
             margin: 0;
-            padding-left: var(--sidebar-width); /* Space for sidebar */
             background-color: var(--light-bg);
             color: var(--text-color-light);
             line-height: 1.6;
@@ -52,6 +52,7 @@
 
         .main-content {
             padding: 20px 40px;
+            padding-left: calc(var(--sidebar-width) + 40px);
         }
 
         h1, h2, h3 {
@@ -169,6 +170,11 @@
             border-left: 4px solid var(--success-color);
             word-wrap: break-word;
         }
+        #dhcpResult p[style*="text-align:right"] { 
+            text-align: right; 
+            color: var(--secondary-color);
+            font-style: italic;
+        }
 
         .bit-bar {
             display: flex;
@@ -212,8 +218,10 @@
         .sidebar li a.done::before { content: '✔ '; color: var(--success-color); }
 
         .progress-container {
-            width: calc(100% - var(--sidebar-width)); background-color: var(--border-color);
-            position: fixed; top: 0; left: var(--sidebar-width); z-index: 999;
+            width: 100%;
+            background-color: var(--border-color);
+            position: fixed; top: 0; left: 0; 
+            z-index: 998; /* Below sidebar, above content */
         }
         .progress-bar {
             height: 8px; width: 0%; background-color: var(--primary-color); transition: width 0.1s linear;
@@ -258,12 +266,41 @@
         #scoreHistoryChart svg { width: 100%; height: 100px; }
         #scoreHistoryChart .bar { fill: var(--primary-color); transition: height 0.3s; }
         #scoreHistoryChart .bar:hover { fill: var(--primary-hover); }
+
+        .sidebar-toggle {
+            display: none; /* Only show on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001; /* Above progress bar, below sidebar */
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 45px; height: 45px;
+            font-size: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
         
         @media (max-width: 992px) {
             body { padding-left: 0; }
-            .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
+            .main-content { padding: 20px; padding-left: 20px; padding-top: 70px; }
+            .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); transition: transform 0.3s ease-in-out; }
+            .sidebar-toggle { display: block; }
             .progress-container { width: 100%; left: 0; }
-            .main-content { padding: 20px; }
         }
     </style>
 </head>
@@ -271,6 +308,9 @@
     <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
     </div>
+    
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open navigation">☰</button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <nav class="sidebar" id="sidebar">
         <h2>Bài Học</h2>
@@ -320,7 +360,7 @@
                 <li><strong>Địa chỉ MAC (Physical Address):</strong> Như số Căn cước công dân của thiết bị, là duy nhất và không đổi. Nó dùng để gửi dữ liệu trong mạng nội bộ (LAN).</li>
                 <li><strong>DNS (Domain Name System):</strong> Như danh bạ điện thoại, dịch tên miền (ví dụ: google.com) thành địa chỉ IP để máy tính có thể hiểu và kết nối.</li>
             </ul>
-            <p><strong>Ví dụ thực tế:</strong> Khi bạn gõ `google.com` vào trình duyệt, máy tính của bạn hỏi DNS server để lấy IP của Google. Sau đó, nó tạo gói tin với IP đích đó và gửi đến router. Router sẽ dùng địa chỉ MAC để chuyển gói tin trong mạng LAN. Quá trình này được điều phối bởi Giao thức phân giải địa chỉ (ARP). Tìm hiểu thêm tại <a href="https://tools.ietf.org/html/rfc826" target="_blank" rel="noopener noreferrer">RFC826 (ARP)</a>.</p>
+            <p><strong>Ví dụ thực tế:</strong> Khi bạn gõ `google.com` vào trình duyệt, máy tính của bạn hỏi DNS server để lấy IP của Google. Sau đó, nó tạo gói tin với IP đích đó và gửi đến router. Quá trình này được điều phối bởi Giao thức phân giải địa chỉ (ARP). <strong>Khi một máy tính muốn gửi dữ liệu đến một IP trong cùng mạng LAN, nó sẽ gửi một gói tin ARP hỏi 'Ai có IP này? Hãy cho tôi biết địa chỉ MAC của bạn'. Máy tính có IP đó sẽ trả lời bằng địa chỉ MAC của mình.</strong> Tìm hiểu thêm tại <a href="https://tools.ietf.org/html/rfc826" target="_blank" rel="noopener noreferrer">RFC826 (ARP)</a>.</p>
         </div>
 
         <div class="section" id="step1">
@@ -356,7 +396,7 @@
         <div class="section" id="step2">
             <h2>Bước 2: Subnet Mask Là Gì? (Giống Như Ranh Giới Khu Phố)</h2>
             <p>Nếu thành phố quá lớn, ta chia thành các khu phố nhỏ (subnet) để dễ quản lý. Subnet Mask là "ranh giới" nói rằng phần nào là khu phố (network), phần nào là nhà riêng (host).</p>
-            <p>Ví dụ: Subnet Mask 255.255.255.0 (hoặc /24) nghĩa là 24 bit đầu là khu phố, 8 bit sau là nhà (có thể có 256 nhà, nhưng trừ 2 nên 254 nhà dùng được).</p>
+            <p>Ví dụ: Subnet Mask 255.255.255.0 (hoặc /24) nghĩa là 24 bit đầu là khu phố, 8 bit sau là nhà (có thể có 2^8 = 256 địa chỉ). <strong>Tuy nhiên, chúng ta phải trừ đi 2 địa chỉ: một địa chỉ đầu tiên dùng làm địa chỉ mạng (Network Address) và một địa chỉ cuối cùng dùng làm địa chỉ quảng bá (Broadcast Address).</strong> Vì vậy, thực tế chỉ có 254 nhà dùng được.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Subnet Mask như biển báo "Khu phố từ số 1 đến 255". Nếu vượt ra, thư sẽ không đến đúng khu.</div>
             <h3>Sơ Đồ Minh Họa: Chia Khu Phố Với Subnet</h3>
             <canvas id="subnetCityCanvas" width="600" height="400"></canvas>
@@ -367,7 +407,7 @@
                 <input type="range" id="cidrSlider" min="0" max="32" value="24" oninput="updateCidr()" aria-label="CIDR Slider" />
                 <div id="bitBar" class="bit-bar"></div>
                 <p>Màu xanh dương: Khu phố (Network). Màu xanh lá: Nhà riêng (Host).</p>
-                <p>Số nhà khả dụng trong khu: <span id="hostCount">254</span> (càng nhiều bit khu phố, khu nhỏ hơn, ít nhà hơn).</p>
+                <p>Số nhà khả dụng trong khu: <span id="hostCount">254</span> (luôn trừ 2 cho địa chỉ mạng và quảng bá).</p>
             </div>
         </div>
         <div class="section" id="step3">
@@ -378,8 +418,8 @@
             <canvas id="addressRangeCanvas" width="600" height="200"></canvas>
             <div class="interactive">
                 <h3>Tương Tác 3: Nhập IP Và CIDR Để Tính Toán</h3>
-                <input type="text" id="ipInputSubnet" placeholder="IP: 192.168.1.10" aria-label="IP for Subnet Calculation" />
-                <input type="text" id="cidrInputSubnet" placeholder="CIDR: /24" aria-label="CIDR for Subnet Calculation" />
+                <input type="text" id="ipInputSubnet" placeholder="IP: 192.168.1.10 hoặc 192.168.1.10/24" aria-label="IP for Subnet Calculation" />
+                <input type="text" id="cidrInputSubnet" placeholder="CIDR: /24 (hoặc để trống nếu nhập ở trên)" aria-label="CIDR for Subnet Calculation" />
                 <button onclick="calculateSubnet()" aria-label="Calculate Subnet">Tính Và Minh Họa</button>
                 <div id="subnetResult" class="result-box"></div>
             </div>
@@ -433,6 +473,7 @@
                 <input type="text" id="baseNetwork" placeholder="Network gốc: 192.168.1.0/24" aria-label="Base network for subnetting"/>
                 <input type="number" id="numSubnets" placeholder="Số subnet: 4" min="2" max="128" aria-label="Number of subnets to create"/>
                 <button onclick="calculateSubnets()" aria-label="Calculate Subnets">Chia Subnet</button>
+                <button id="useForVlsmBtn" style="display:none;" onclick="populateVlsm()">Dùng kết quả cho VLSM</button>
                 <div id="subnettingResult" class="result-box"></div>
             </div>
         </div>
@@ -471,7 +512,12 @@
         <div class="section" id="step9">
             <h2>Bước 9: VLSM - Variable Length Subnet Mask (Subnet Linh Hoạt)</h2>
             <p>VLSM cho phép chia subnet với kích thước khác nhau, tiết kiệm địa chỉ IP. Thay vì chia đều, bạn có thể có subnet lớn nhỏ tùy nhu cầu. Nguyên tắc quan trọng là <strong>sắp xếp các yêu cầu về số host từ lớn nhất đến nhỏ nhất</strong> trước khi bắt đầu chia mạng.</p>
-            <p>Cách tính prefix cho một số lượng host yêu cầu: `prefix = 32 - ceil(log2(số_host_yêu_cầu + 2))`. Cộng 2 là để dành cho địa chỉ mạng và broadcast.</p>
+            <p>Để tính prefix cho một số lượng host yêu cầu, ta làm theo các bước sau:</p>
+            <ol>
+                <li>Lấy số host yêu cầu cộng thêm 2 (để dành cho địa chỉ mạng và broadcast).</li>
+                <li>Tìm số <code>x</code> nhỏ nhất sao cho <code>2^x</code> lớn hơn hoặc bằng kết quả trên. <code>x</code> chính là số bit cần cho phần host.</li>
+                <li>Prefix (CIDR) mới sẽ là <code>32 - x</code>.</li>
+            </ol>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Chia khu đất thành các phần: một phần lớn cho công viên, phần nhỏ cho nhà ở, tùy theo nhu cầu.</div>
             <h3>Sơ Đồ Minh Họa: VLSM Với Các Subnet Kích Thước Khác Nhau</h3>
             <canvas id="vlsmCanvas" width="600" height="400"></canvas>
@@ -526,7 +572,7 @@
             <canvas id="dhcpCanvas" width="600" height="300"></canvas>
             <div class="interactive">
                 <h3>Tương Tác 9: Mô Phỏng Yêu Cầu IP Từ DHCP</h3>
-                <p>Nhập "MAC Address" (giả, bất kỳ) và nhấn để nhận IP tự động từ pool 192.168.1.0/24.</p>
+                <p>Nhập "MAC Address" (giả, bất kỳ) và nhấn để xem quá trình cấp phát IP tự động từ pool 192.168.1.0/24.</p>
                 <input type="text" id="macInput" placeholder="MAC: 00:11:22:33:44:55" aria-label="Simulated MAC Address"/>
                 <label for="leaseTimeSlider">Lease Time (giây): <span id="leaseTimeValue">86400</span></label>
                 <input type="range" id="leaseTimeSlider" min="60" max="604800" value="86400" step="60" oninput="document.getElementById('leaseTimeValue').textContent = this.value" aria-label="Lease Time Slider" />
@@ -565,6 +611,8 @@
         <div class="section" id="step14">
             <h2>Bước 14: Routing Cơ Bản (Định Tuyến Dữ Liệu)</h2>
             <p>Routing là cách dữ liệu đi từ mạng này sang mạng khác, qua router dựa trên bảng định tuyến.</p>
+             <h3>Default Gateway là gì?</h3>
+            <p>Default Gateway (cổng mặc định) là một khái niệm cực kỳ quan trọng. Nó chính là địa chỉ IP của Router trong mạng LAN, là cửa ngõ để các thiết bị trong mạng có thể kết nối ra các mạng khác, bao gồm cả Internet. Khi DHCP cấp phát IP, nó cũng sẽ cung cấp địa chỉ Default Gateway này cho các thiết bị.</p>
             <h3>Static vs. Dynamic Routing</h3>
             <ul>
                 <li><strong>Static Routing:</strong> Người quản trị phải cấu hình đường đi thủ công. Phù hợp cho mạng nhỏ, đơn giản. Ví dụ lệnh trên router Cisco: `ip route 0.0.0.0 0.0.0.0 192.168.1.1` (gửi mọi traffic không xác định đến gateway 192.168.1.1).</li>
@@ -595,7 +643,6 @@
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như bảo vệ cửa nhà, chỉ cho người quen vào, chặn kẻ lạ.</div>
             <h3>Sơ Đồ Minh Họa Động: Mô Phỏng Firewall Chặn Kết Nối</h3>
             <canvas id="firewallCanvas" width="600" height="400"></canvas>
-            <button onclick="animateFirewall()" aria-label="Run Firewall Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 12: Thiết Lập Quy Tắc Firewall (JSON)</h3>
                 <p>Soạn thảo một mảng các quy tắc bằng JSON. Nhập IP nguồn và port để kiểm tra.</p>
@@ -623,7 +670,6 @@
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như đường hầm bí mật kết nối nhà bạn với công ty, an toàn khỏi kẻ xấu ngoài đường.</div>
             <h3>Sơ Đồ Minh Họa Động: Kết Nối VPN</h3>
             <canvas id="vpnCanvas" width="600" height="300"></canvas>
-            <button onclick="animateVpn()" aria-label="Run VPN Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 13: Mô Phỏng Kết Nối VPN</h3>
                 <p>Nhập "Server VPN" và "User IP", nhấn để "kết nối" và xem địa chỉ thay đổi (giả).</p>
@@ -651,7 +697,6 @@
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như radio FM, bạn chọn kênh (SSID) và mật khẩu để nghe riêng.</div>
             <h3>Sơ Đồ Minh Họa Động: Kết Nối Wi-Fi</h3>
             <canvas id="wifiCanvas" width="600" height="400"></canvas>
-            <button onclick="animateWifi()" aria-label="Run Wi-Fi Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 14: Mô Phỏng Kết Nối Wi-Fi</h3>
                 <p>Nhập SSID và mật khẩu (giả: SSID 'MyWiFi', mật khẩu '12345678'), nhấn để kết nối.</p>
@@ -688,7 +733,6 @@
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP là địa chỉ nhà, port là số phòng, socket là "nhà + phòng" để gửi thư đúng người.</div>
             <h3>Sơ Đồ Minh Họa Động: Dữ Liệu Đi Qua Port</h3>
             <canvas id="portCanvas" width="600" height="300"></canvas>
-            <button onclick="animatePort()" aria-label="Run Port Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 15: Kiểm Tra Dịch Vụ Port</h3>
                 <p>Nhập số port (0-65535), xem dịch vụ phổ biến.</p>
@@ -704,7 +748,6 @@
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> TCP như chuyển phát nhanh có biên nhận, UDP như phát tờ rơi nhanh nhưng có thể mất.</div>
             <h3>Sơ Đồ Minh Họa Động: So Sánh TCP/UDP</h3>
             <canvas id="tcpUdpCanvas" width="600" height="400"></canvas>
-            <button onclick="animateTcpUdp()" aria-label="Run TCP vs UDP Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 16: Chọn Giao Thức Cho Ứng Dụng</h3>
                 <p>Nhập ứng dụng (web, video, email, game, voice call), xem nên dùng TCP, UDP hay QUIC.</p>
@@ -789,6 +832,8 @@ const themeToggle = document.getElementById('theme-toggle');
 const quizModal = document.getElementById('quizModal');
 const closeModalButton = document.getElementById('closeModalButton');
 const modalBody = document.getElementById('modal-body');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 // --- Progress Bar & Sidebar Active State ---
 function updateScrollProgress() {
@@ -818,14 +863,20 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
     localStorage.setItem('theme', theme);
-    // Redraw canvases on theme change if needed
-    window.onload();
+    // Redraw canvases on theme change
+    redrawAllCanvases();
 }
 
 function toggleTheme() {
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     applyTheme(newTheme);
+}
+
+// --- Mobile Sidebar ---
+function toggleSidebar() {
+    sidebar.classList.toggle('show');
+    sidebarOverlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
 }
 
 // --- Modal ---
@@ -851,8 +902,10 @@ function saveProgress(sectionId) {
 function updateProgressUI() {
     let completedSections = JSON.parse(localStorage.getItem('completedSections')) || [];
     completedSections.forEach(sectionId => {
-        document.getElementById(sectionId)?.classList.add('done');
-        document.getElementById(`nav-${sectionId}`)?.classList.add('done');
+        const sectionEl = document.getElementById(sectionId);
+        const navEl = document.getElementById(`nav-${sectionId}`);
+        if(sectionEl) sectionEl.classList.add('done');
+        if(navEl) navEl.classList.add('done');
     });
 }
 
@@ -866,51 +919,63 @@ window.addEventListener('click', (event) => {
         closeModal();
     }
 });
+sidebarToggle.addEventListener('click', toggleSidebar);
+sidebarOverlay.addEventListener('click', toggleSidebar);
+sidebarLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 992) {
+            toggleSidebar();
+        }
+    });
+});
+window.addEventListener('resize', redrawAllCanvases);
 
 
-// --- OLD SCRIPT (MODIFIED AND EXPANDED) ---
-
-// Helper function to convert number to IP string
+// --- UTILITY FUNCTIONS ---
 function numToIp(num) {
     return [(num >>> 24) & 255, (num >>> 16) & 255, (num >>> 8) & 255, num & 255].join('.');
 }
+function ipToNum(ip) {
+    return ip.split('.').map(Number).reduce((acc, octet) => (acc << 8) | octet, 0) >>> 0;
+}
+function isIpInCidr(ip, cidrStr) {
+    try {
+        const [cidrIp, cidrPrefixStr] = cidrStr.split('/');
+        const prefix = parseInt(cidrPrefixStr, 10);
+        if(isNaN(prefix) || prefix < 0 || prefix > 32) return false;
 
-// Vẽ IP như nhà
-function drawIpHouse() {
-    const canvas = document.getElementById('ipHouseCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ thành phố
-    ctx.fillStyle = '#ffc107';
-    ctx.fillRect(50, 150, 500, 100);
-    ctx.fillStyle = '#343a40';
-    ctx.font = '20px Arial';
-    ctx.fillText('Thành Phố Internet', 200, 180);
-    // Vẽ nhà
-    ctx.fillStyle = '#28a745';
-    ctx.beginPath();
-    ctx.moveTo(250, 100);
-    ctx.lineTo(300, 50);
-    ctx.lineTo(350, 100);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillRect(250, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('Nhà (Host)', 260, 150);
-    ctx.fillStyle = '#007bff';
-    ctx.font = '16px Arial';
-    ctx.fillText('IP: 192.168.1.1', 240, 220);
-    // Chú thích
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '14px Arial';
-    ctx.fillText('Phần đầu: Quận/Phường (Network)', 50, 270);
-    ctx.fillText('Phần sau: Số nhà (Host)', 350, 270);
+        const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+        const ipNum = ipToNum(ip);
+        const cidrIpNum = ipToNum(cidrIp);
+        
+        return (ipNum & mask) === (cidrIpNum & mask);
+    } catch(e) {
+        return false;
+    }
+}
+function resizeCanvas(canvas) {
+    const { width, height } = canvas.getBoundingClientRect();
+    canvas.width = width;
+    canvas.height = height || width * 0.5; // fallback height
+}
+function getThemeColors() {
+    const style = getComputedStyle(document.documentElement);
+    return {
+        bg: style.getPropertyValue('--card-bg'),
+        text: style.getPropertyValue('--text-color-light'),
+        primary: style.getPropertyValue('--primary-color').trim(),
+        success: style.getPropertyValue('--success-color').trim(),
+        danger: style.getPropertyValue('--danger-color').trim(),
+        warning: style.getPropertyValue('--warning-color').trim(),
+        info: style.getPropertyValue('--info-color').trim(),
+        secondary: style.getPropertyValue('--secondary-color').trim(),
+    };
 }
 
-// Chuyển IP sang binary
+
+// --- INTERACTIVE FUNCTIONS ---
+
+// Step 1
 function convertToBinary() {
     const ip = document.getElementById('ipInputBinary').value.trim();
     const resultDiv = document.getElementById('binaryResult');
@@ -924,40 +989,7 @@ function convertToBinary() {
     saveProgress('step1');
 }
 
-// Vẽ subnet như khu phố
-function drawSubnetCity() {
-    const canvas = document.getElementById('subnetCityCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ khu phố lớn
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(50, 50, 500, 300);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '20px Arial';
-    ctx.fillText('Thành Phố Lớn (Mạng Chính)', 150, 40);
-    // Vẽ subnet nhỏ
-    ctx.strokeStyle = '#007bff';
-    ctx.strokeRect(100, 100, 200, 200);
-    ctx.fillText('Khu Phố Con (Subnet)', 110, 320);
-    // Vẽ nhà trong subnet
-    for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = '#28a745';
-        ctx.fillRect(120 + i * 60, 150, 40, 40);
-        ctx.fillStyle = 'white';
-        ctx.font = '12px Arial';
-        ctx.fillText('Nhà', 125 + i * 60, 170);
-    }
-    // Chú thích
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '14px Arial';
-    ctx.fillText('Subnet Mask chia khu lớn thành nhỏ, dễ quản lý hơn.', 50, 370);
-}
-
-// Cập nhật CIDR
+// Step 2
 function updateCidr() {
     const cidr = document.getElementById('cidrSlider').value;
     document.getElementById('cidrValue').textContent = cidr;
@@ -973,39 +1005,22 @@ function updateCidr() {
     const hosts = Math.pow(2, 32 - cidr);
     const availableHosts = (hosts > 2) ? hosts - 2 : 0;
     document.getElementById('hostCount').textContent = availableHosts.toLocaleString();
-    if(parseInt(cidr) !== 24) saveProgress('step2'); // Mark as done if they interact
+    if(parseInt(cidr) !== 24) saveProgress('step2');
     drawAddressRange(cidr);
 }
 
-// Vẽ dải địa chỉ
-function drawAddressRange(cidr = 24) {
-    const canvas = document.getElementById('addressRangeCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = '#e9ecef';
-    ctx.fillRect(50, 80, 500, 20);
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(50, 80, (cidr / 32) * 500, 20);
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50 + (cidr / 32) * 500, 80, ((32 - cidr) / 32) * 500, 20);
-
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '16px Arial';
-    ctx.fillText('Dải Địa Chỉ Toàn Bộ (32 bit)', 150, 50);
-    ctx.fillText('Phần Khu Phố (Network)', 60, 120);
-    ctx.fillText('Phần Nhà (Host)', 450, 120);
-}
-
-// Tính subnet
+// Step 3
 function calculateSubnet() {
-    const ip = document.getElementById('ipInputSubnet').value.trim();
-    const cidrStr = document.getElementById('cidrInputSubnet').value.trim();
+    let ip = document.getElementById('ipInputSubnet').value.trim();
+    let cidrStr = document.getElementById('cidrInputSubnet').value.trim();
     const resultDiv = document.getElementById('subnetResult');
+    
+    if (ip.includes('/')) {
+        const parts = ip.split('/');
+        ip = parts[0];
+        if (!cidrStr) cidrStr = `/${parts[1]}`;
+    }
+
     if (!ip || !cidrStr) {
         resultDiv.innerHTML = '<p style="color:red;">Vui lòng nhập IP và CIDR!</p>';
         return;
@@ -1021,7 +1036,7 @@ function calculateSubnet() {
         return;
     }
 
-    const ipNum = (ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3];
+    const ipNum = ipToNum(ip);
     const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
     const networkNum = ipNum & mask;
     const broadcastNum = networkNum | (~mask >>> 0);
@@ -1038,7 +1053,6 @@ function calculateSubnet() {
     saveProgress('step3');
 }
 
-// Kiểm tra IP trong subnet
 function checkIpInSubnet() {
     const networkStr = document.getElementById('networkInput').value.trim();
     const checkIp = document.getElementById('checkIpInput').value.trim();
@@ -1047,31 +1061,16 @@ function checkIpInSubnet() {
         resultDiv.innerHTML = '<p style="color:red;">Vui lòng nhập đầy đủ!</p>';
         return;
     }
-    const [netIp, cidrStr] = networkStr.split('/');
-    if (!netIp || !cidrStr) {
+    if (!networkStr.includes('/')) {
         resultDiv.innerHTML = '<p style="color:red;">Định dạng Network sai (ví dụ: 192.168.1.0/24)</p>';
         return;
     }
-    const cidr = parseInt(cidrStr);
-    if (isNaN(cidr) || cidr < 0 || cidr > 32) {
-        resultDiv.innerHTML = '<p style="color:red;">CIDR không hợp lệ!</p>';
-        return;
-    }
-    const netParts = netIp.split('.').map(Number);
-    const checkParts = checkIp.split('.').map(Number);
-    if (netParts.length !== 4 || checkParts.length !== 4 || netParts.some(isNaN) || checkParts.some(isNaN)) {
-        resultDiv.innerHTML = '<p style="color:red;">IP không hợp lệ!</p>';
-        return;
-    }
     
-    const mask = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
-    const netNum = (netParts[0] << 24) | (netParts[1] << 16) | (netParts[2] << 8) | netParts[3];
-    const checkNum = (checkParts[0] << 24) | (checkParts[1] << 16) | (checkParts[2] << 8) | checkParts[3];
-    const isIn = (checkNum & mask) === (netNum & mask);
+    const isIn = isIpInCidr(checkIp, networkStr);
     resultDiv.innerHTML = `<p style="color:${isIn ? 'green' : 'red'}; font-weight: bold;">${isIn ? '✔️ Có, IP này thuộc subnet.' : '❌ Không, IP này không thuộc subnet.'}</p>`;
 }
 
-// --- Modified Quiz Functions ---
+// Step 4
 function checkQuiz() {
     const ans1 = document.getElementById('quiz1').value;
     const ans2 = document.getElementById('quiz2').value;
@@ -1087,155 +1086,7 @@ function checkQuiz() {
     if (score === 3) saveProgress('step4');
 }
 
-function checkAdvancedQuiz() {
-    const ans4 = document.getElementById('quiz4').value;
-    const ans5 = document.getElementById('quiz5').value;
-    let score = 0;
-    let feedback = '<ul>';
-    if (ans4 === '30') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Với /27, có 32-27=5 bit host. Số host là 2^5 - 2 = 30.</li>'; }
-    if (ans5 === 'private') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: IP 10.x.x.x là IP Private.</li>'; }
-    feedback += '</ul>';
-    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/2 câu!</h3> ${feedback}`;
-    showModal(resultMessage);
-    if (score === 2) saveProgress('step8');
-}
-
-function checkFinalQuiz() {
-    const ans6 = document.getElementById('quiz6').value;
-    const ans7 = document.getElementById('quiz7').value;
-    const ans8 = document.getElementById('quiz8').value;
-    let score = 0;
-    let feedback = '<ul>';
-    if (ans6 === 'chặn') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Firewall lọc và chặn lưu lượng nguy hiểm.</li>'; }
-    if (ans7 === 'mã hóa') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: VPN tạo kết nối mã hóa an toàn qua internet.</li>'; }
-    if (ans8 === 'wpa23') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Nên dùng WPA2 hoặc WPA3 để bảo mật Wi-Fi.</li>'; }
-    feedback += '</ul>';
-    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
-    showModal(resultMessage);
-    if (score === 3) saveProgress('step18');
-}
-
-function renderScoreChart(quizId) {
-    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
-    const chartDiv = document.getElementById('scoreHistoryChart');
-    if (!history.length || !chartDiv) return;
-
-    const maxScore = 3; 
-    const barWidth = 100 / history.length;
-    let svgContent = `<svg viewBox="0 0 100 ${maxScore}" preserveAspectRatio="none">`;
-    history.forEach((score, index) => {
-        const height = score.score;
-        const x = index * barWidth;
-        svgContent += `<rect class="bar" x="${x}%" y="${maxScore - height}" width="${barWidth - 2}%" height="${height}"><title>Điểm: ${score.score}/${maxScore} - Ngày: ${new Date(score.date).toLocaleString()}</title></rect>`;
-    });
-    svgContent += '</svg>';
-    chartDiv.innerHTML = `<h4>Lịch sử Quiz:</h4>${svgContent}`;
-}
-
-
-function checkTotalQuiz() {
-    const ans9 = document.getElementById('quiz9').value;
-    const ans10 = document.getElementById('quiz10').value;
-    const ans11 = document.getElementById('quiz11').value;
-    let score = 0;
-    let feedback = '<ul>';
-    if (ans9 === 'http') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Port 80 là cổng mặc định cho HTTP (Web).</li>'; }
-    if (ans10 === 'udp') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: Video streaming ưu tiên tốc độ nên dùng UDP.</li>'; }
-    if (ans11 === 'network') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Tầng 3 (Network) xử lý địa chỉ IP và định tuyến.</li>'; }
-    feedback += '</ul>';
-    
-    // Save score
-    const quizId = 'totalQuizHistory';
-    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
-    history.push({ score: score, date: new Date() });
-    if(history.length > 10) history.shift(); // keep last 10 scores
-    localStorage.setItem(quizId, JSON.stringify(history));
-
-    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
-    showModal(resultMessage);
-    if (score === 3) saveProgress('step22');
-    renderScoreChart(quizId);
-}
-
-// --- NEW AND EXPANDED FUNCTIONS ---
-
-// Vẽ mô phỏng mạng
-function drawNetworkSimulation() {
-    const canvas = document.getElementById('networkSimulationCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ router
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(400, 100, 50, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
-    ctx.fillText('Router', 365, 105);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '14px Arial';
-    ctx.fillText('IP: 192.168.1.1/24', 350, 140);
-    // Vẽ hosts
-    const hosts = [{ x: 200, y: 300, ip: '192.168.1.10' }, { x: 400, y: 300, ip: '192.168.1.20' }, { x: 600, y: 300, ip: '192.168.1.30' }];
-    hosts.forEach(host => {
-        ctx.fillStyle = '#28a745';
-        ctx.beginPath();
-        ctx.arc(host.x, host.y, 40, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.font = '16px Arial';
-        ctx.fillText('Host', host.x - 20, host.y + 5);
-        ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-        ctx.font = '12px Arial';
-        ctx.fillText(`IP: ${host.ip}`, host.x - 40, host.y + 50);
-        // Kết nối
-        ctx.strokeStyle = '#6c757d';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(400, 150);
-        ctx.lineTo(host.x, host.y - 40);
-        ctx.stroke();
-    });
-    ctx.font = '18px Arial';
-    ctx.fillText('Mạng LAN Với Subnet 192.168.1.0/24', 250, 50);
-}
-
-// Vẽ subnetting
-function drawSubnetting() {
-    const canvas = document.getElementById('subnettingCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.font = '20px Arial';
-    // Vẽ mạng lớn
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(100, 50, 400, 100);
-    ctx.fillText('Mạng Gốc /24', 220, 40);
-    // Vẽ subnet nhỏ
-    for (let i = 0; i < 4; i++) {
-        ctx.strokeStyle = '#007bff';
-        ctx.strokeRect(100 + i * 100, 200, 100, 100);
-        ctx.fillText(`Subnet ${i + 1} /26`, 105 + i * 100, 320);
-    }
-    // Kết nối
-    for (let i = 0; i < 4; i++) {
-        ctx.strokeStyle = '#6c757d';
-        ctx.beginPath();
-        ctx.moveTo(300, 150);
-        ctx.lineTo(150 + i * 100, 200);
-        ctx.stroke();
-    }
-    ctx.fillText('Chia thành 4 subnet', 220, 370);
-}
-
-// Tính toán chia subnet
+// Step 6
 function calculateSubnets() {
     const baseStr = document.getElementById('baseNetwork').value.trim();
     const numSubnets = parseInt(document.getElementById('numSubnets').value);
@@ -1251,8 +1102,7 @@ function calculateSubnets() {
     }
 
     const baseCidr = parseInt(baseCidrStr);
-    const baseParts = baseIp.split('.').map(Number);
-    const baseNum = (baseParts[0] << 24) | (baseParts[1] << 16) | (baseParts[2] << 8) | baseParts[3];
+    const baseNum = ipToNum(baseIp);
     const bitsNeeded = Math.ceil(Math.log2(numSubnets));
     const newCidr = baseCidr + bitsNeeded;
     if (newCidr > 32) {
@@ -1269,41 +1119,19 @@ function calculateSubnets() {
     }
     output += '</ul>';
     resultDiv.innerHTML = output;
+    document.getElementById('useForVlsmBtn').style.display = 'inline-block';
     saveProgress('step6');
 }
 
-// Vẽ public private
-function drawPublicPrivate() {
-    const canvas = document.getElementById('publicPrivateCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ private network
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 100, 200, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('Private Network', 80, 150);
-    // Vẽ public internet
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(450, 150, 80, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('Public Internet', 400, 150);
-    // Kết nối
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(250, 150);
-    ctx.lineTo(370, 150);
-    ctx.stroke();
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Router (NAT)', 280, 170);
+function populateVlsm() {
+    const baseNetwork = document.getElementById('baseNetwork').value;
+    const vlsmNetworkInput = document.getElementById('vlsmNetwork');
+    vlsmNetworkInput.value = baseNetwork;
+    vlsmNetworkInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('vlsmHosts').focus();
 }
 
-// Kiểm tra loại IP
+// Step 7
 function checkIpType() {
     const ip = document.getElementById('ipTypeInput').value.trim();
     const resultDiv = document.getElementById('ipTypeResult');
@@ -1324,35 +1152,21 @@ function checkIpType() {
     saveProgress('step7');
 }
 
-// Vẽ VLSM
-function drawVlsm() {
-    const canvas = document.getElementById('vlsmCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ mạng lớn
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(50, 50, 500, 50);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Mạng Gốc /16', 250, 40);
-    // Vẽ subnet khác kích thước
-    ctx.strokeStyle = '#007bff';
-    ctx.strokeRect(50, 150, 300, 50);
-    ctx.fillText('Subnet for 100 hosts (/25)', 60, 180);
-    ctx.strokeStyle = '#28a745';
-    ctx.strokeRect(50, 250, 150, 50);
-    ctx.fillText('Subnet for 50 hosts (/26)', 60, 280);
-    ctx.strokeStyle = '#ffc107';
-    ctx.strokeRect(250, 250, 100, 50);
-    ctx.fillText('Subnet for 20 hosts (/27)', 255, 280);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('VLSM tiết kiệm IP bằng cách chia subnet với kích thước khác nhau', 50, 350);
+// Step 8
+function checkAdvancedQuiz() {
+    const ans4 = document.getElementById('quiz4').value;
+    const ans5 = document.getElementById('quiz5').value;
+    let score = 0;
+    let feedback = '<ul>';
+    if (ans4 === '30') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Với /27, có 32-27=5 bit host. Số host là 2^5 - 2 = 30.</li>'; }
+    if (ans5 === 'private') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: IP 10.x.x.x là IP Private.</li>'; }
+    feedback += '</ul>';
+    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/2 câu!</h3> ${feedback}`;
+    showModal(resultMessage);
+    if (score === 2) saveProgress('step8');
 }
 
-// Tính VLSM
+// Step 9
 function calculateVLSM() {
     const baseStr = document.getElementById('vlsmNetwork').value.trim();
     const hostsStr = document.getElementById('vlsmHosts').value.trim();
@@ -1367,12 +1181,11 @@ function calculateVLSM() {
         return;
     }
     const baseCidr = parseInt(baseCidrStr);
-    const baseParts = baseIp.split('.').map(Number);
-    if (baseParts.some(isNaN) || isNaN(baseCidr)) {
+    if (isNaN(baseCidr)) {
         resultDiv.innerHTML = '<p style="color:red;">Network gốc không hợp lệ!</p>';
         return;
     }
-    const baseNum = (baseParts[0] << 24) | (baseParts[1] << 16) | (baseParts[2] << 8) | baseParts[3];
+    const baseNum = ipToNum(baseIp);
     let hosts = hostsStr.split(',').map(Number).filter(n => n > 0).sort((a,b) => b - a);
     if(hosts.some(isNaN)) {
          resultDiv.innerHTML = '<p style="color:red;">Số host không hợp lệ!</p>';
@@ -1401,30 +1214,7 @@ function calculateVLSM() {
     saveProgress('step9');
 }
 
-// Vẽ IPv6
-function drawIpv6() {
-    const canvas = document.getElementById('ipv6Canvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // IPv4
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(50, 100, 150, 50);
-    ctx.fillStyle = 'white';
-    ctx.font = '18px Arial';
-    ctx.fillText('IPv4: 32 bit', 60, 130);
-    // IPv6
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 200, 450, 50);
-    ctx.fillStyle = 'white';
-    ctx.fillText('IPv6: 128 bit', 60, 230);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('IPv6 có không gian địa chỉ lớn hơn rất nhiều so với IPv4', 100, 270);
-}
-
-// Rút gọn IPv6
+// Step 10
 function compressIpv6() {
     let ip = document.getElementById('ipv6ToCompress').value.trim();
     const resultDiv = document.getElementById('ipv6CompressedResult');
@@ -1432,20 +1222,27 @@ function compressIpv6() {
         resultDiv.innerHTML = '<p style="color:red;">Vui lòng nhập địa chỉ IPv6.</p>';
         return;
     }
+    let compressed = ip.replace(/(^|:)0+([0-9a-fA-F])/g, '$1$2'); // remove leading zeros
+    compressed = compressed.replace(/((^|:)0){2,}/g, (match, p1) => {
+        return p1 === ':' ? '::' : ':';
+    });
+    // A bit of a simplified compression, but good for demo
+    // Proper one is much more complex
+    let parts = ip.split(':');
+    if (parts.length !== 8) {
+         resultDiv.innerHTML = `<p style="color:red">Địa chỉ IPv6 không hợp lệ.</p>`;
+         return;
+    }
     // Step 1: remove leading zeros in each block
-    ip = ip.split(':').map(part => part.replace(/^0+/, '') || '0').join(':');
+    let cleaned = parts.map(part => part.replace(/^0+/, '') || '0').join(':');
 
     // Step 2: find the longest sequence of zeros and replace with '::'
-    let longest_sequence_start = -1;
-    let longest_sequence_length = 0;
-    let current_sequence_start = -1;
-    let current_sequence_length = 0;
-    let parts = ip.split(':');
-    for (let i = 0; i < parts.length; i++) {
-        if (parts[i] === '0') {
-            if (current_sequence_start === -1) {
-                current_sequence_start = i;
-            }
+    let longest_sequence_start = -1, longest_sequence_length = 0;
+    let current_sequence_start = -1, current_sequence_length = 0;
+    let cleanedParts = cleaned.split(':');
+    for (let i = 0; i < cleanedParts.length; i++) {
+        if (cleanedParts[i] === '0') {
+            if (current_sequence_start === -1) current_sequence_start = i;
             current_sequence_length++;
         } else {
             if (current_sequence_length > longest_sequence_length) {
@@ -1462,126 +1259,41 @@ function compressIpv6() {
     }
 
     if (longest_sequence_length > 1) {
-        parts.splice(longest_sequence_start, longest_sequence_length, '');
-        if (longest_sequence_start === 0) {
-            ip = ':' + parts.join(':');
-        } else if (longest_sequence_start + longest_sequence_length === parts.length + longest_sequence_length) {
-            ip = parts.join(':') + ':';
-        } else {
-            ip = parts.join(':');
-        }
+        cleanedParts.splice(longest_sequence_start, longest_sequence_length, '');
+        cleaned = cleanedParts.join(':').replace(':::', '::');
     }
 
-    resultDiv.innerHTML = `<p>Địa chỉ rút gọn: <strong>${ip}</strong></p>`;
+    resultDiv.innerHTML = `<p>Địa chỉ rút gọn: <strong>${cleaned}</strong></p>`;
     saveProgress('step10');
 }
 
-// Vẽ NAT
-function drawNat() {
-    const canvas = document.getElementById('natCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ private hosts
-    for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = '#28a745';
-        ctx.fillRect(50 + i * 100, 200, 80, 50);
-        ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-        ctx.fillText('192.168.1.' + (10+i), 50 + i*100, 270);
-    }
-    // Vẽ router
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(300, 100, 50, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('NAT Router', 260, 105);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Public IP: 203.0.113.1', 250, 170);
-    // Kết nối private
-    for (let i = 0; i < 3; i++) {
-        ctx.strokeStyle = '#6c757d';
-        ctx.beginPath();
-        ctx.moveTo(90 + i * 100, 200);
-        ctx.lineTo(300, 150);
-        ctx.stroke();
-    }
-    // Internet
-    ctx.fillStyle = '#dc3545';
-    ctx.beginPath();
-    ctx.arc(500, 100, 60, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('Internet', 470, 105);
-    ctx.strokeStyle = '#6c757d';
-    ctx.beginPath();
-    ctx.moveTo(350, 100);
-    ctx.lineTo(440, 100);
-    ctx.stroke();
-}
-
-// Vẽ DHCP
-function drawDhcp() {
-    const canvas = document.getElementById('dhcpCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ client
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('Client', 80, 150);
-    // Vẽ DHCP server
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(450, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('DHCP Server', 455, 150);
-    // Arrows
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('1. DHCP Discover ➔', 170, 120);
-    ctx.fillText('🠐 2. DHCP Offer', 300, 150);
-    ctx.fillText('3. DHCP Request ➔', 170, 180);
-    ctx.fillText('🠐 4. DHCP ACK', 300, 210);
-}
-
-// Mô phỏng DHCP
-function requestDhcpIp() {
+// Step 12
+async function requestDhcpIp() {
     const mac = document.getElementById('macInput').value.trim() || '00:11:22:33:44:55';
     const leaseTime = document.getElementById('leaseTimeSlider').value;
-    const ip = '192.168.1.' + Math.floor(Math.random() * 254 + 2);
-    document.getElementById('dhcpResult').innerHTML = `<p>MAC <strong>${mac}</strong> nhận IP: <strong>${ip}</strong>. Thời gian thuê: <strong>${leaseTime} giây</strong>.</p>`;
+    const resultDiv = document.getElementById('dhcpResult');
+    resultDiv.innerHTML = '';
+    
+    const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+    resultDiv.innerHTML += '<p>Client: Gửi DHCP Discover (Broadcast)...</p>';
+    await sleep(1000);
+
+    const offeredIp = '192.168.1.' + Math.floor(Math.random() * 253 + 2);
+    resultDiv.innerHTML += `<p style="text-align:right;">Server: Nhận Discover, gửi DHCP Offer (IP: ${offeredIp})...</p>`;
+    await sleep(1000);
+    
+    resultDiv.innerHTML += `<p>Client: Nhận Offer, gửi DHCP Request (chấp nhận IP ${offeredIp})...</p>`;
+    await sleep(1000);
+
+    resultDiv.innerHTML += `<p style="text-align:right;">Server: Nhận Request, gửi DHCP Acknowledge. Cấp phát thành công!</p>`;
+    await sleep(500);
+
+    resultDiv.innerHTML += `<hr><p style="color:var(--success-color); font-weight:bold;">MAC ${mac} đã nhận IP: ${offeredIp}. Thời gian thuê: ${leaseTime} giây.</p>`;
     saveProgress('step12');
 }
 
-// Vẽ DNS
-function drawDns() {
-    const canvas = document.getElementById('dnsCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ client
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('Client', 80, 150);
-    // Vẽ DNS server
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(450, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('DNS Server', 455, 150);
-    // Kết nối
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Query: "example.com"? ➔', 170, 140);
-    ctx.fillText('🠐 Response: "93.184.216.34"', 170, 180);
-}
-
-// Mô phỏng DNS
+// Step 13
 function resolveDnsRecord() {
     const domain = document.getElementById('domainInput').value.trim() || 'example.com';
     const type = document.getElementById('dnsRecordType').value;
@@ -1598,45 +1310,7 @@ function resolveDnsRecord() {
     saveProgress('step13');
 }
 
-// Vẽ Routing
-function drawRouting() {
-    const canvas = document.getElementById('routingCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    // Vẽ mạng 1
-    ctx.strokeStyle = '#28a745';
-    ctx.strokeRect(50, 100, 200, 200);
-    ctx.fillText('Mạng 1: 192.168.1.0/24', 60, 80);
-    // Vẽ router
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(350, 200, 50, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('Router', 320, 205);
-    // Vẽ mạng 2
-    ctx.strokeStyle = '#dc3545';
-    ctx.strokeRect(450, 100, 200, 200);
-     ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Mạng 2: 192.168.2.0/24', 460, 80);
-    // Kết nối
-    ctx.strokeStyle = '#6c757d';
-    ctx.beginPath();
-    ctx.moveTo(250, 200);
-    ctx.lineTo(300, 200);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(400, 200);
-    ctx.lineTo(450, 200);
-    ctx.stroke();
-    ctx.fillText('Định tuyến dữ liệu giữa các mạng', 200, 350);
-}
-
-// Kiểm tra routing
+// Step 14
 function checkRouting() {
     const source = document.getElementById('sourceIp').value.trim();
     const dest = document.getElementById('destIp').value.trim();
@@ -1646,84 +1320,19 @@ function checkRouting() {
         resultDiv.innerHTML = '<p style="color:red;">Nhập đầy đủ!</p>';
         return;
     }
-    const sourceParts = source.split('.').map(Number);
-    const destParts = dest.split('.').map(Number);
-    const maskParts = maskStr.split('.').map(Number);
-    if (sourceParts.length !== 4 || destParts.length !== 4 || maskParts.length !== 4 || sourceParts.some(isNaN) || destParts.some(isNaN) || maskParts.some(isNaN)) {
-        resultDiv.innerHTML = '<p style="color:red;">Format sai!</p>';
-        return;
-    }
-    const sourceNum = (sourceParts[0] << 24) | (sourceParts[1] << 16) | (sourceParts[2] << 8) | sourceParts[3];
-    const destNum = (destParts[0] << 24) | (destParts[1] << 16) | (destParts[2] << 8) | destParts[3];
-    const maskNum = (maskParts[0] << 24) | (maskParts[1] << 16) | (maskParts[2] << 8) | maskParts[3];
-    const sameNetwork = (sourceNum & maskNum) === (destNum & maskNum);
-    resultDiv.innerHTML = `<p style="font-weight:bold;">${sameNetwork ? 'Cùng mạng, không cần router.' : 'Khác mạng, cần router.'}</p>`;
-    saveProgress('step14');
-}
-
-// Vẽ Firewall
-function drawFirewall(packetX, status) {
-    const canvas = document.getElementById('firewallCanvas');
-     if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ mạng nội bộ
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 150, 150, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('Mạng Nội Bộ', 70, 200);
-    // Vẽ firewall
-    ctx.fillStyle = '#dc3545';
-    ctx.fillRect(300, 100, 20, 200);
-    ctx.fillStyle = 'white';
-    ctx.save();
-    ctx.translate(310, 200);
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign = 'center';
-    ctx.fillText('FIREWALL', 0, 5);
-    ctx.restore();
-    // Vẽ internet
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(500, 200, 50, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('Internet', 470, 205);
-    
-    if (packetX) {
-        ctx.fillStyle = status === 'blocked' ? '#ff0000' : '#00ff00';
-        ctx.beginPath();
-        ctx.arc(packetX, 200, 10, 0, 2 * Math.PI);
-        ctx.fill();
-
-        if (status) {
-            ctx.font = '20px Arial';
-            ctx.fillStyle = status === 'blocked' ? '#ff0000' : '#00ff00';
-            ctx.fillText(status === 'blocked' ? 'Chặn!' : 'Cho phép!', 350, 150);
-        }
+    try {
+        const sourceNum = ipToNum(source);
+        const destNum = ipToNum(dest);
+        const maskNum = ipToNum(maskStr);
+        const sameNetwork = (sourceNum & maskNum) === (destNum & maskNum);
+        resultDiv.innerHTML = `<p style="font-weight:bold;">${sameNetwork ? 'Cùng mạng, không cần router.' : 'Khác mạng, cần router.'}</p>`;
+        saveProgress('step14');
+    } catch {
+        resultDiv.innerHTML = '<p style="color:red;">Format IP hoặc Mask sai!</p>';
     }
 }
-let firewallAnimationId;
-// Animation firewall
-function animateFirewall() {
-    cancelAnimationFrame(firewallAnimationId);
-    let x = 450;
-    const isBlocked = Math.random() > 0.5;
-    function animate() {
-        if ((isBlocked && x <= 330) || (!isBlocked && x <= 200)) {
-            drawFirewall(x, isBlocked ? 'blocked' : 'allowed');
-            return;
-        }
-        drawFirewall(x);
-        x -= 5;
-        firewallAnimationId = requestAnimationFrame(animate);
-    }
-    animate();
-}
 
-// Kiểm tra firewall JSON
+// Step 15
 function checkFirewallRules() {
     const resultDiv = document.getElementById('firewallJsonResult');
     try {
@@ -1732,91 +1341,31 @@ function checkFirewallRules() {
         const port = parseInt(document.getElementById('firewallCheckPort').value);
         
         for (const rule of rules) {
-            let match = false;
+            let ipMatch = !rule.source_ip;
+            let portMatch = !rule.port || isNaN(port) || rule.port === port;
+            
             if (rule.source_ip) {
-                // simple check for now, not full CIDR
-                if (ipStr === rule.source_ip || (rule.source_ip.includes('/') && ipStr.startsWith(rule.source_ip.split('/')[0].slice(0, -1)))) {
-                     match = true;
+                if (rule.source_ip.includes('/')) {
+                    ipMatch = isIpInCidr(ipStr, rule.source_ip);
                 } else {
-                    continue; // if source_ip is specified and doesn't match, skip rule
+                    ipMatch = (ipStr === rule.source_ip);
                 }
             }
-            if (rule.port) {
-                if(port === rule.port) match = true; else continue;
-            }
-            if(rule.protocol && rule.protocol !== 'any'){
-                // for simplicity, we assume all traffic matches the protocol
-                match = true;
-            } else {
-                 match = true;
-            }
-            
-            if (match || rule.action === 'deny' && rule.protocol === 'any') { // default deny
-                const color = rule.action === 'allow' ? 'green' : 'red';
+
+            if (ipMatch && portMatch) {
+                const color = rule.action === 'allow' ? 'var(--success-color)' : 'var(--danger-color)';
                 resultDiv.innerHTML = `<p style="color:${color}; font-weight:bold;">Hành động: ${rule.action.toUpperCase()}. Lý do: ${rule.description}</p>`;
                 saveProgress('step15');
                 return;
             }
         }
+         resultDiv.innerHTML = `<p>Không có luật nào khớp.</p>`;
     } catch(e) {
-        resultDiv.innerHTML = '<p style="color:red;">Lỗi JSON không hợp lệ!</p>';
+        resultDiv.innerHTML = `<p style="color:red;">Lỗi JSON không hợp lệ!</p>`;
     }
 }
-// Vẽ VPN
-function drawVpn() {
-    const canvas = document.getElementById('vpnCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ user
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('User', 80, 150);
-    // Vẽ VPN server
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(450, 100, 100, 100);
-    ctx.fillStyle = 'white';
-    ctx.fillText('VPN Server', 455, 150);
-    // Đường hầm
-    ctx.fillStyle = 'rgba(220, 53, 69, 0.5)';
-    ctx.fillRect(150, 130, 300, 40);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Đường Hầm An Toàn (Encrypted Tunnel)', 180, 180);
-}
-let vpnAnimationId;
-// Animation VPN
-function animateVpn() {
-    cancelAnimationFrame(vpnAnimationId);
-    let x = 160;
 
-    function animate() {
-        drawVpn(); // Redraws static background
-        
-        const canvas = document.getElementById('vpnCanvas');
-        if (!canvas?.getContext) return;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffcc00';
-        ctx.beginPath();
-        ctx.arc(x, 150, 15, 0, 2 * Math.PI);
-        ctx.fill();
-        x += 5;
-
-        if (x < 450) {
-            vpnAnimationId = requestAnimationFrame(animate);
-        } else {
-            drawVpn(); // Redraw to clear animated dot
-            ctx.fillStyle = '#00ff00';
-            ctx.font = '20px Arial';
-            ctx.fillText('Kết Nối!', 460, 150);
-        }
-    }
-    animate();
-}
-
-// Mô phỏng kết nối VPN
+// Step 16
 function connectVpn() {
     const server = document.getElementById('vpnServer').value.trim() || 'vpn.example.com';
     const ip = document.getElementById('userIp').value.trim() || '192.168.1.10';
@@ -1825,72 +1374,7 @@ function connectVpn() {
     saveProgress('step16');
 }
 
-// Vẽ Wi-Fi
-function drawWifi(radius) {
-    const canvas = document.getElementById('wifiCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ router
-    ctx.fillStyle = '#007bff';
-    ctx.beginPath();
-    ctx.arc(300, 200, 30, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = 'white';
-    ctx.fillText('Wi-Fi AP', 270, 205);
-    // Sóng
-    for (let i = 1; i <= 3; i++) {
-        ctx.strokeStyle = '#007bff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(300, 200, 40 + i * 20, -Math.PI/3, Math.PI/3);
-        ctx.stroke();
-    }
-    // Thiết bị
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(50, 150, 50, 50);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Device', 50, 220);
-    ctx.fillStyle = '#28a745';
-    ctx.fillRect(500, 150, 50, 50);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Device', 500, 220);
-    
-    if (radius) {
-         ctx.strokeStyle = '#ffff00';
-         ctx.lineWidth = 4;
-         ctx.beginPath();
-         ctx.arc(300, 200, radius, 0, 2 * Math.PI);
-         ctx.stroke();
-    }
-}
-let wifiAnimationId;
-// Animation Wi-Fi
-function animateWifi() {
-    cancelAnimationFrame(wifiAnimationId);
-    let radius = 40;
-
-    function animate() {
-        drawWifi(radius);
-        radius += 5;
-        if (radius < 250) {
-            wifiAnimationId = requestAnimationFrame(animate);
-        } else {
-             drawWifi();
-             const canvas = document.getElementById('wifiCanvas');
-             if (!canvas?.getContext) return;
-             const ctx = canvas.getContext('2d');
-             ctx.fillStyle = '#00ff00';
-             ctx.font = '20px Arial';
-             ctx.fillText('Kết Nối!', 250, 300);
-        }
-    }
-    animate();
-}
-
-// Kiểm tra độ mạnh mật khẩu
+// Step 17
 function checkPasswordStrength(password) {
     const strengthDiv = document.getElementById('passwordStrength');
     let score = 0;
@@ -1901,15 +1385,14 @@ function checkPasswordStrength(password) {
     if (/[^A-Za-z0-9]/.test(password)) score++;
     
     let width = (score / 5) * 100;
-    let color = '#dc3545'; // Yếu
-    if (score >= 3) color = '#ffc107'; // Trung bình
-    if (score >= 4) color = '#28a745'; // Mạnh
+    const colors = getThemeColors();
+    let color = colors.danger; // Yếu
+    if (score >= 3) color = colors.warning; // Trung bình
+    if (score >= 4) color = colors.success; // Mạnh
     
     strengthDiv.style.width = width + '%';
     strengthDiv.style.backgroundColor = color;
 }
-
-// Mô phỏng kết nối Wi-Fi
 function connectWifi() {
     const ssid = document.getElementById('ssidInput').value.trim() || 'MyWiFi';
     const pass = document.getElementById('wifiPass').value.trim();
@@ -1917,61 +1400,27 @@ function connectWifi() {
         document.getElementById('wifiResult').innerHTML = `<p>Đang thử kết nối đến SSID <strong>${ssid}</strong>...</p>`;
         saveProgress('step17');
     } else {
-         document.getElementById('wifiResult').innerHTML = `<p style="color:red">Vui lòng nhập mật khẩu cho SSID <strong>${ssid}</strong>!</p>`;
+         document.getElementById('wifiResult').innerHTML = `<p style="color:var(--danger-color)">Vui lòng nhập mật khẩu cho SSID <strong>${ssid}</strong>!</p>`;
     }
 }
 
-// Vẽ Port
-function drawPort() {
-    const canvas = document.getElementById('portCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ tòa nhà
-    ctx.fillStyle = '#6c757d';
-    ctx.fillRect(200, 100, 200, 150);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('IP: 203.0.113.10 (Server)', 220, 90);
-    // Vẽ port
-    const ports = [{num: 80, name: 'Web'}, {num: 443, name: 'Secure'}, {num: 25, name: 'Email'}];
-    ports.forEach((port, i) => {
-        ctx.fillStyle = '#007bff';
-        ctx.fillRect(220 + i*60, 160, 40, 40);
-        ctx.fillStyle = 'white';
-        ctx.fillText('P:' + port.num, 222 + i*60, 185);
-    });
-}
-let portAnimationId;
-function animatePort() {
-    cancelAnimationFrame(portAnimationId);
-    let y = 50;
-
-    function animate() {
-        drawPort(); // Redraws static background
-        const canvas = document.getElementById('portCanvas');
-        if (!canvas?.getContext) return;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ff0000';
-        ctx.beginPath();
-        ctx.arc(240, y, 10, 0, 2 * Math.PI);
-        ctx.fill();
-        y += 5;
-
-        if (y < 170) {
-            portAnimationId = requestAnimationFrame(animate);
-        } else {
-            drawPort(); // Redraw to clear animated dot
-            ctx.fillStyle = '#00ff00';
-            ctx.font = '20px Arial';
-            ctx.fillText('Đến Port 80!', 250, 150);
-        }
-    }
-    animate();
+// Step 18
+function checkFinalQuiz() {
+    const ans6 = document.getElementById('quiz6').value;
+    const ans7 = document.getElementById('quiz7').value;
+    const ans8 = document.getElementById('quiz8').value;
+    let score = 0;
+    let feedback = '<ul>';
+    if (ans6 === 'chặn') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Firewall lọc và chặn lưu lượng nguy hiểm.</li>'; }
+    if (ans7 === 'mã hóa') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: VPN tạo kết nối mã hóa an toàn qua internet.</li>'; }
+    if (ans8 === 'wpa23') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Nên dùng WPA2 hoặc WPA3 để bảo mật Wi-Fi.</li>'; }
+    feedback += '</ul>';
+    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
+    showModal(resultMessage);
+    if (score === 3) saveProgress('step18');
 }
 
-// Kiểm tra port
+// Step 19
 function checkPort() {
     const port = parseInt(document.getElementById('portInput').value);
     const resultDiv = document.getElementById('portResult');
@@ -1995,80 +1444,8 @@ function checkPort() {
     resultDiv.innerHTML = `<p>Port <strong>${port}</strong> thuộc dải <strong>${range}</strong>. Dịch vụ phổ biến: ${service}</p>`;
     saveProgress('step19');
 }
-// Vẽ TCP UDP
-function drawTcpUdp() {
-    const canvas = document.getElementById('tcpUdpCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // TCP
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(50, 100, 200, 150);
-    ctx.fillStyle = 'white';
-    ctx.fillText('TCP: An toàn, tin cậy', 60, 150);
-    ctx.fillText('Gói 1 ->', 80, 180);
-    ctx.fillText('<- ACK 1', 140, 195);
-    // UDP
-    ctx.fillStyle = '#dc3545';
-    ctx.fillRect(350, 100, 200, 150);
-    ctx.fillStyle = 'white';
-    ctx.fillText('UDP: Nhanh, không tin cậy', 360, 150);
-    ctx.fillText('Gói 1 ->', 380, 180);
-    ctx.fillText('Gói 2 ->', 380, 195);
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('TCP cho web, email. UDP cho video, game.', 150, 300);
-}
 
-let tcpUdpAnimationId;
-function animateTcpUdp() {
-    cancelAnimationFrame(tcpUdpAnimationId);
-    let tcpX = 50, udpX = 350;
-    const tcpDest = 250, udpDest = 550;
-
-    function animate() {
-        drawTcpUdp();
-        const canvas = document.getElementById('tcpUdpCanvas');
-        if (!canvas?.getContext) return;
-        const ctx = canvas.getContext('2d');
-        
-        // TCP packet
-        if (tcpX < tcpDest) {
-            ctx.fillStyle = '#00ff00';
-            ctx.beginPath();
-            ctx.arc(tcpX, 180, 10, 0, 2 * Math.PI);
-            ctx.fill();
-            tcpX += 2;
-        } else {
-            ctx.fillStyle = '#00ff00';
-            ctx.beginPath();
-            ctx.arc(tcpDest, 180, 10, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-
-        // UDP packet
-        if (udpX < udpDest) {
-            ctx.fillStyle = '#ffff00';
-            ctx.beginPath();
-            ctx.arc(udpX, 180, 10, 0, 2 * Math.PI);
-            ctx.fill();
-            udpX += 5;
-        } else {
-             ctx.fillStyle = '#ffff00';
-            ctx.beginPath();
-            ctx.arc(udpDest, 180, 10, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-        
-        if (tcpX < tcpDest || udpX < udpDest) {
-            tcpUdpAnimationId = requestAnimationFrame(animate);
-        }
-    }
-    animate();
-}
-
-// Gợi ý protocol
+// Step 20
 function suggestProtocol() {
     const app = document.getElementById('appInput').value.trim().toLowerCase();
     let protocol = 'TCP';
@@ -2085,56 +1462,11 @@ function suggestProtocol() {
     saveProgress('step20');
 }
 
-// Vẽ OSI
-function drawOsi(highlightLayer = -1) {
-    const canvas = document.getElementById('osiCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
-    const theme = document.documentElement.getAttribute('data-theme');
-    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const layers = ['7. Application', '6. Presentation', '5. Session', '4. Transport', '3. Network', '2. Data Link', '1. Physical'];
-    for (let i = 0; i < 7; i++) {
-        if (i === (7-highlightLayer)) {
-            ctx.fillStyle = '#ffc107'; // highlight color
-        } else {
-            ctx.fillStyle = `hsl(${i*50}, 70%, 50%)`;
-        }
-        ctx.fillRect(100, 50 + i * 60, 400, 50);
-        ctx.fillStyle = 'white';
-        ctx.font = '18px Arial';
-        ctx.fillText(layers[i], 120, 80 + i * 60);
-    }
-    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
-    ctx.fillText('Mô Hình OSI 7 Tầng', 230, 30);
-}
-let osiAnimationId;
-// Animation OSI
-function animateOsi() {
-    cancelAnimationFrame(osiAnimationId);
-    let y = 50;
-    
-    function animate() {
-        drawOsi();
-        const canvas = document.getElementById('osiCanvas');
-        if (!canvas?.getContext) return;
-        const ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#ffcc00';
-        ctx.lineWidth = 5;
-        ctx.strokeRect(95, y, 410, 50);
-        y += 5;
-        if (y > 50 + 6 * 60) {
-            y = 50;
-        }
-        osiAnimationId = requestAnimationFrame(animate);
-    }
-    animate();
-}
-
-// Highlight OSI Layer
+// Step 21
 function highlightOsiLayer() {
-    const layer = document.getElementById('osiProtocolSelect').value;
-    const protocolName = document.getElementById('osiProtocolSelect').options[document.getElementById('osiProtocolSelect').selectedIndex].text;
+    const select = document.getElementById('osiProtocolSelect');
+    const layer = select.value;
+    const protocolName = select.options[select.selectedIndex].text;
     if(!layer) {
         drawOsi(-1);
         return;
@@ -2144,19 +1476,781 @@ function highlightOsiLayer() {
     saveProgress('step21');
 }
 
+// Step 22
+function renderScoreChart(quizId) {
+    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
+    const chartDiv = document.getElementById('scoreHistoryChart');
+    if (!history.length || !chartDiv) return;
 
-// Initial drawings on page load and setup
-window.onload = () => {
-    // Apply saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    // Don't call applyTheme here to avoid recursion on theme toggle, set attribute directly
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    const maxScore = 3; 
+    const barWidth = 100 / history.length;
+    let svgContent = `<svg viewBox="0 0 100 ${maxScore}" preserveAspectRatio="none">`;
+    history.forEach((score, index) => {
+        const height = score.score;
+        const x = index * barWidth;
+        svgContent += `<rect class="bar" x="${x}%" y="${maxScore - height}" width="${barWidth - 2}%" height="${height}"><title>Điểm: ${score.score}/${maxScore} - Ngày: ${new Date(score.date).toLocaleString()}</title></rect>`;
+    });
+    svgContent += '</svg>';
+    chartDiv.innerHTML = `<h4>Lịch sử Quiz:</h4>${svgContent}`;
+}
 
-    // Load saved progress
-    updateProgressUI();
+function checkTotalQuiz() {
+    const ans9 = document.getElementById('quiz9').value;
+    const ans10 = document.getElementById('quiz10').value;
+    const ans11 = document.getElementById('quiz11').value;
+    let score = 0;
+    let feedback = '<ul>';
+    if (ans9 === 'http') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Port 80 là cổng mặc định cho HTTP (Web).</li>'; }
+    if (ans10 === 'udp') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: Video streaming ưu tiên tốc độ nên dùng UDP.</li>'; }
+    if (ans11 === 'network') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Tầng 3 (Network) xử lý địa chỉ IP và định tuyến.</li>'; }
+    feedback += '</ul>';
+    
+    // Save score
+    const quizId = 'totalQuizHistory';
+    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
+    history.push({ score: score, date: new Date() });
+    if(history.length > 10) history.shift(); // keep last 10 scores
+    localStorage.setItem(quizId, JSON.stringify(history));
 
-    // Initial drawings
+    const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
+    showModal(resultMessage);
+    if (score === 3) saveProgress('step22');
+    renderScoreChart(quizId);
+}
+
+
+// --- CANVAS DRAWING FUNCTIONS (RESPONSIVE) ---
+function drawIpHouse() {
+    const canvas = document.getElementById('ipHouseCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = colors.warning;
+    ctx.fillRect(w * 0.1, h * 0.5, w * 0.8, h * 0.4);
+    ctx.fillStyle = colors.text;
+    ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Thành Phố Internet', w / 2, h * 0.65);
+    
+    ctx.fillStyle = colors.success;
+    const houseW = w * 0.2;
+    const houseH = h * 0.3;
+    const houseX = w / 2 - houseW / 2;
+    const houseY = h * 0.2;
+    ctx.beginPath();
+    ctx.moveTo(houseX, houseY);
+    ctx.lineTo(houseX + houseW / 2, h * 0.05);
+    ctx.lineTo(houseX + houseW, houseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillRect(houseX, houseY, houseW, houseH);
+    ctx.fillStyle = colors.primary;
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.fillText('IP: 192.168.1.1', w / 2, h * 0.8);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Phần đầu: Network', w * 0.25, h * 0.95);
+    ctx.fillText('Phần sau: Host', w * 0.75, h * 0.95);
+}
+
+function drawSubnetCity() {
+    const canvas = document.getElementById('subnetCityCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = colors.danger;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.8);
+    ctx.fillStyle = colors.text;
+    ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Thành Phố Lớn (Mạng Chính)', w / 2, h * 0.08);
+
+    ctx.strokeStyle = colors.primary;
+    ctx.strokeRect(w * 0.2, h * 0.25, w * 0.6, h * 0.5);
+    ctx.fillText('Khu Phố Con (Subnet)', w / 2, h * 0.8);
+
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = colors.success;
+        ctx.fillRect(w * 0.3 + i * w * 0.15, h * 0.4, w * 0.1, w * 0.1);
+    }
+}
+
+function drawAddressRange(cidr = 24) {
+    const canvas = document.getElementById('addressRangeCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    
+    ctx.fillStyle = '#e9ecef';
+    ctx.fillRect(w * 0.1, h * 0.4, w * 0.8, h * 0.2);
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w * 0.1, h * 0.4, (cidr / 32) * w * 0.8, h * 0.2);
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w * 0.1 + (cidr / 32) * w * 0.8, h * 0.4, ((32 - cidr) / 32) * w * 0.8, h * 0.2);
+
+    ctx.fillStyle = colors.text;
+    ctx.font = `${Math.min(w*0.04, 16)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Dải Địa Chỉ Toàn Bộ (32 bit)', w / 2, h * 0.2);
+    ctx.textAlign = 'left';
+    ctx.fillText('Network', w * 0.1, h * 0.75);
+    ctx.textAlign = 'right';
+    ctx.fillText('Host', w * 0.9, h * 0.75);
+}
+
+function drawNetworkSimulation() {
+    const canvas = document.getElementById('networkSimulationCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = colors.primary;
+    const routerR = Math.min(w * 0.08, 50);
+    ctx.beginPath();
+    ctx.arc(w / 2, h * 0.2, routerR, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = `${Math.min(w*0.03, 20)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Router', w / 2, h * 0.2 + 5);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('192.168.1.1/24', w / 2, h * 0.2 + routerR + 20);
+
+    const hosts = [
+        { x: w * 0.2, y: h * 0.7, ip: '1.10' }, 
+        { x: w * 0.5, y: h * 0.7, ip: '1.20' }, 
+        { x: w * 0.8, y: h * 0.7, ip: '1.30' }
+    ];
+    const hostR = Math.min(w * 0.07, 40);
+    hosts.forEach(host => {
+        ctx.fillStyle = colors.success;
+        ctx.beginPath();
+        ctx.arc(host.x, host.y, hostR, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = colors.text;
+        ctx.font = `${Math.min(w*0.025, 12)}px Arial`;
+        ctx.fillText(`192.168.${host.ip}`, host.x, host.y + hostR + 15);
+        ctx.strokeStyle = colors.secondary;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(w / 2, h * 0.2 + routerR);
+        ctx.lineTo(host.x, host.y - hostR);
+        ctx.stroke();
+    });
+}
+
+function drawSubnetting() {
+    const canvas = document.getElementById('subnettingCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = colors.text;
+    ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+    ctx.textAlign = 'center';
+
+    ctx.strokeStyle = colors.danger;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(w*0.1, h*0.1, w*0.8, h*0.2);
+    ctx.fillText('Mạng Gốc /24', w/2, h*0.08);
+
+    for (let i = 0; i < 4; i++) {
+        ctx.strokeStyle = colors.primary;
+        ctx.strokeRect(w*0.05 + i * w*0.23, h*0.5, w*0.2, h*0.3);
+        ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+        ctx.fillText(`Subnet ${i + 1} /26`, w*0.15 + i*w*0.23, h*0.85);
+        ctx.strokeStyle = colors.secondary;
+        ctx.beginPath();
+        ctx.moveTo(w/2, h*0.3);
+        ctx.lineTo(w*0.15 + i*w*0.23, h*0.5);
+        ctx.stroke();
+    }
+}
+
+function drawPublicPrivate() {
+    const canvas = document.getElementById('publicPrivateCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w * 0.1, h * 0.3, w * 0.3, h * 0.4);
+    ctx.fillStyle = 'white';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Private Network', w * 0.25, h / 2);
+
+    ctx.fillStyle = colors.primary;
+    ctx.beginPath();
+    ctx.arc(w * 0.8, h / 2, w*0.1, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Internet', w * 0.8, h / 2);
+
+    ctx.strokeStyle = colors.danger;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.4, h / 2);
+    ctx.lineTo(w * 0.7, h / 2);
+    ctx.stroke();
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Router (NAT)', w * 0.55, h*0.5 + 20);
+}
+
+function drawVlsm() {
+    const canvas = document.getElementById('vlsmCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = colors.danger;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(w*0.1, h*0.1, w*0.8, h*0.15);
+    ctx.fillStyle = colors.text;
+    ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+    ctx.fillText('Mạng Gốc /16', w/2, h*0.08);
+
+    ctx.textAlign = 'left';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.strokeStyle = colors.primary;
+    ctx.strokeRect(w*0.1, h*0.4, w*0.6, h*0.15);
+    ctx.fillText('Subnet for 100 hosts (/25)', w*0.12, h*0.5);
+    ctx.strokeStyle = colors.success;
+    ctx.strokeRect(w*0.1, h*0.6, w*0.3, h*0.15);
+    ctx.fillText('Subnet for 50 hosts (/26)', w*0.12, h*0.7);
+    ctx.strokeStyle = colors.warning;
+    ctx.strokeRect(w*0.45, h*0.6, w*0.2, h*0.15);
+    ctx.fillText('Subnet for 20 hosts (/27)', w*0.47, h*0.7);
+}
+
+function drawIpv6() {
+    const canvas = document.getElementById('ipv6Canvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = `${Math.min(w*0.04, 18)}px Arial`;
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w*0.1, h*0.2, w*0.4, h*0.2);
+    ctx.fillStyle = 'white';
+    ctx.fillText('IPv4: 32 bit', w*0.3, h*0.3);
+    
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w*0.1, h*0.6, w*0.8, h*0.2);
+    ctx.fillStyle = 'white';
+    ctx.fillText('IPv6: 128 bit', w*0.5, h*0.7);
+}
+
+function drawNat() {
+    const canvas = document.getElementById('natCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    
+    const routerR = Math.min(w * 0.08, 50);
+    ctx.fillStyle = colors.primary;
+    ctx.beginPath();
+    ctx.arc(w/2, h*0.3, routerR, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.fillText('NAT Router', w/2, h*0.3);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Public: 203.0.113.1', w/2, h*0.3 + routerR + 20);
+
+    ctx.fillStyle = colors.danger;
+    const internetR = Math.min(w * 0.1, 60);
+    ctx.beginPath();
+    ctx.arc(w*0.85, h*0.3, internetR, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Internet', w*0.85, h*0.3);
+
+    ctx.strokeStyle = colors.secondary;
+    ctx.beginPath();
+    ctx.moveTo(w/2 + routerR, h*0.3);
+    ctx.lineTo(w*0.85 - internetR, h*0.3);
+    ctx.stroke();
+
+    for (let i = 0; i < 3; i++) {
+        const hostX = w*0.2 + i * w*0.3;
+        const hostY = h*0.7;
+        ctx.fillStyle = colors.success;
+        ctx.fillRect(hostX - w*0.07, hostY - h*0.1, w*0.14, h*0.2);
+        ctx.fillStyle = colors.text;
+        ctx.fillText('192.168.1.' + (10+i), hostX, hostY+h*0.15);
+        
+        ctx.beginPath();
+        ctx.moveTo(hostX, hostY - h*0.1);
+        ctx.lineTo(w/2, h*0.3 + routerR);
+        ctx.stroke();
+    }
+}
+
+function drawDhcp() {
+    const canvas = document.getElementById('dhcpCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w*0.1, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Client', w*0.2, h*0.5);
+
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w*0.7, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('DHCP Server', w*0.8, h*0.5);
+    
+    ctx.fillStyle = colors.text;
+    ctx.fillText('1. Discover ➔', w/2, h*0.3);
+    ctx.fillText('🠐 2. Offer', w/2, h*0.45);
+    ctx.fillText('3. Request ➔', w/2, h*0.6);
+    ctx.fillText('🠐 4. ACK', w/2, h*0.75);
+}
+
+function drawDns() {
+    const canvas = document.getElementById('dnsCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w*0.1, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Client', w*0.2, h*0.5);
+    
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w*0.7, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('DNS Server', w*0.8, h*0.5);
+
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Query: "example.com"? ➔', w/2, h*0.4);
+    ctx.fillText('🠐 Response: "93.184.216.34"', w/2, h*0.6);
+}
+
+function drawRouting() {
+    const canvas = document.getElementById('routingCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    
+    ctx.strokeStyle = colors.success;
+    ctx.strokeRect(w*0.05, h*0.2, w*0.3, h*0.6);
+    ctx.fillText('Mạng 1: 192.168.1.0/24', w*0.2, h*0.15);
+    
+    ctx.fillStyle = colors.primary;
+    ctx.beginPath();
+    ctx.arc(w/2, h/2, w*0.08, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Router', w/2, h/2);
+    
+    ctx.strokeStyle = colors.danger;
+    ctx.strokeRect(w*0.65, h*0.2, w*0.3, h*0.6);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Mạng 2: 192.168.2.0/24', w*0.8, h*0.15);
+    
+    ctx.strokeStyle = colors.secondary;
+    ctx.beginPath();
+    ctx.moveTo(w*0.35, h/2);
+    ctx.lineTo(w/2-w*0.08, h/2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(w/2+w*0.08, h/2);
+    ctx.lineTo(w*0.65, h/2);
+    ctx.stroke();
+}
+
+function drawFirewall(packetX, status) {
+    const canvas = document.getElementById('firewallCanvas');
+     if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w*0.1, h*0.3, w*0.25, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Mạng Nội Bộ', w*0.225, h/2);
+    
+    ctx.fillStyle = colors.danger;
+    ctx.fillRect(w/2 - w*0.02, h*0.2, w*0.04, h*0.6);
+    
+    ctx.fillStyle = colors.primary;
+    ctx.beginPath();
+    ctx.arc(w*0.8, h/2, w*0.1, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Internet', w*0.8, h/2);
+    
+    if (packetX) {
+        ctx.fillStyle = status === 'blocked' ? colors.danger : colors.success;
+        ctx.beginPath();
+        ctx.arc(packetX, h/2, w*0.02, 0, 2 * Math.PI);
+        ctx.fill();
+
+        if (status) {
+            ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+            ctx.fillStyle = status === 'blocked' ? colors.danger : colors.success;
+            ctx.fillText(status === 'blocked' ? 'Chặn!' : 'Cho phép!', w*0.6, h*0.3);
+        }
+    }
+}
+let firewallAnimationId;
+function animateFirewall() {
+    cancelAnimationFrame(firewallAnimationId);
+    const canvas = document.getElementById('firewallCanvas');
+    if (!canvas?.getContext) return;
+    let x = canvas.width * 0.7;
+    const isBlocked = Math.random() > 0.5;
+    const firewallEdge = canvas.width/2 + canvas.width*0.02;
+    const allowedDest = canvas.width * 0.3;
+    function animate() {
+        if ((isBlocked && x <= firewallEdge) || (!isBlocked && x <= allowedDest)) {
+            drawFirewall(x, isBlocked ? 'blocked' : 'allowed');
+            return;
+        }
+        drawFirewall(x);
+        x -= 5;
+        firewallAnimationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function drawVpn(packetX) {
+    const canvas = document.getElementById('vpnCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    
+    ctx.fillStyle = colors.success;
+    ctx.fillRect(w*0.1, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('User', w*0.2, h/2);
+    
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w*0.7, h*0.3, w*0.2, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('VPN Server', w*0.8, h/2);
+
+    ctx.fillStyle = 'rgba(220, 53, 69, 0.5)';
+    ctx.fillRect(w*0.3, h*0.4, w*0.4, h*0.2);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Encrypted Tunnel', w/2, h*0.65);
+    
+    if (packetX) {
+        ctx.fillStyle = colors.warning;
+        ctx.beginPath();
+        ctx.arc(packetX, h/2, w*0.02, 0, 2*Math.PI);
+        ctx.fill();
+    }
+}
+let vpnAnimationId;
+function animateVpn() {
+    cancelAnimationFrame(vpnAnimationId);
+    const canvas = document.getElementById('vpnCanvas');
+    if (!canvas?.getContext) return;
+    let x = canvas.width * 0.3;
+    const dest = canvas.width * 0.7;
+    function animate() {
+        if(x >= dest) {
+            drawVpn();
+            const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+            ctx.fillStyle = colors.success;
+            ctx.font = `${Math.min(w*0.04, 20)}px Arial`;
+            ctx.fillText('Connected!', w*0.8, h*0.25);
+            return;
+        }
+        drawVpn(x);
+        x += 5;
+        vpnAnimationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function drawWifi(radius) {
+    const canvas = document.getElementById('wifiCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    
+    const routerR = Math.min(w*0.05, 30);
+    ctx.fillStyle = colors.primary;
+    ctx.beginPath();
+    ctx.arc(w/2, h/2, routerR, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    for (let i = 1; i <= 3; i++) {
+        ctx.strokeStyle = colors.primary;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, routerR + i * w*0.04, -Math.PI/3, Math.PI/3);
+        ctx.stroke();
+    }
+
+    if (radius) {
+         ctx.strokeStyle = colors.warning;
+         ctx.lineWidth = 4;
+         ctx.beginPath();
+         ctx.arc(w/2, h/2, radius, 0, 2 * Math.PI);
+         ctx.stroke();
+    }
+}
+let wifiAnimationId;
+function animateWifi() {
+    cancelAnimationFrame(wifiAnimationId);
+    const canvas = document.getElementById('wifiCanvas');
+    if (!canvas?.getContext) return;
+    let radius = Math.min(w*0.05, 30);
+    const maxRadius = canvas.width * 0.4;
+    function animate() {
+        if (radius > maxRadius) {
+             drawWifi();
+             return;
+        }
+        drawWifi(radius);
+        radius += 5;
+        wifiAnimationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function drawPort(packetY) {
+    const canvas = document.getElementById('portCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.textAlign = 'center';
+    
+    ctx.fillStyle = colors.secondary;
+    ctx.fillRect(w*0.3, h*0.25, w*0.4, h*0.6);
+    ctx.fillStyle = colors.text;
+    ctx.fillText('Server IP', w/2, h*0.2);
+
+    const ports = [{num: 80}, {num: 443}, {num: 21}];
+    ports.forEach((port, i) => {
+        ctx.fillStyle = colors.primary;
+        ctx.fillRect(w*0.35 + i*w*0.1, h*0.5, w*0.08, h*0.1);
+        ctx.fillStyle = 'white';
+        ctx.fillText('P:' + port.num, w*0.39 + i*w*0.1, h*0.57);
+    });
+    
+    if (packetY) {
+        ctx.fillStyle = colors.danger;
+        ctx.beginPath();
+        ctx.arc(w*0.39, packetY, w*0.02, 0, 2*Math.PI);
+        ctx.fill();
+    }
+}
+let portAnimationId;
+function animatePort() {
+    cancelAnimationFrame(portAnimationId);
+    const canvas = document.getElementById('portCanvas');
+    if (!canvas?.getContext) return;
+    let y = canvas.height * 0.1;
+    const dest = canvas.height * 0.5;
+    function animate() {
+        if(y > dest) {
+            drawPort();
+            return;
+        }
+        drawPort(y);
+        y += 5;
+        portAnimationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function drawTcpUdp(tcpX, udpX) {
+    const canvas = document.getElementById('tcpUdpCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = `${Math.min(w*0.03, 16)}px Arial`;
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = colors.primary;
+    ctx.fillRect(w*0.1, h*0.2, w*0.3, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('TCP: Tin cậy', w*0.25, h*0.3);
+    
+    ctx.fillStyle = colors.danger;
+    ctx.fillRect(w*0.6, h*0.2, w*0.3, h*0.4);
+    ctx.fillStyle = 'white';
+    ctx.fillText('UDP: Nhanh', w*0.75, h*0.3);
+    
+    if (tcpX) {
+        ctx.fillStyle = colors.success;
+        ctx.beginPath();
+        ctx.arc(tcpX, h*0.8, w*0.02, 0, 2*Math.PI);
+        ctx.fill();
+        if(tcpX > w*0.25){ // ACK
+             ctx.fillStyle = colors.warning;
+             ctx.beginPath();
+             ctx.arc(tcpX-w*0.1, h*0.8, w*0.015, 0, 2*Math.PI);
+             ctx.stroke();
+        }
+    }
+    if (udpX) {
+        ctx.fillStyle = colors.success;
+        ctx.beginPath();
+        ctx.arc(udpX, h*0.8, w*0.02, 0, 2*Math.PI);
+        ctx.fill();
+    }
+}
+let tcpUdpAnimationId;
+function animateTcpUdp() {
+    cancelAnimationFrame(tcpUdpAnimationId);
+    const canvas = document.getElementById('tcpUdpCanvas');
+    if (!canvas?.getContext) return;
+    const { w, h } = canvas;
+    let tcpX = w*0.25, udpX = w*0.75;
+    const dest = w;
+
+    function animate() {
+        let tcpDone = tcpX > dest;
+        let udpDone = udpX > dest;
+        if(tcpDone && udpDone) {
+            drawTcpUdp();
+            return;
+        }
+        drawTcpUdp(tcpX, udpX);
+        if(!tcpDone) tcpX += 2;
+        if(!udpDone) udpX += 5;
+        tcpUdpAnimationId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function drawOsi(highlightLayer = -1) {
+    const canvas = document.getElementById('osiCanvas');
+    if (!canvas?.getContext) return;
+    resizeCanvas(canvas);
+    const ctx = canvas.getContext('2d');
+    const { w, h, colors } = { w: canvas.width, h: canvas.height, colors: getThemeColors() };
+    
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.textAlign = 'center';
+    
+    const layers = ['7. Application', '6. Presentation', '5. Session', '4. Transport', '3. Network', '2. Data Link', '1. Physical'];
+    const layerHeight = h*0.12;
+    for (let i = 0; i < 7; i++) {
+        if (i === (7-highlightLayer)) {
+            ctx.fillStyle = colors.warning;
+        } else {
+            ctx.fillStyle = `hsl(${i*50}, 70%, 50%)`;
+        }
+        ctx.fillRect(w*0.1, h*0.05 + i * layerHeight, w*0.8, layerHeight * 0.9);
+        ctx.fillStyle = 'white';
+        ctx.font = `${Math.min(w*0.03, 18)}px Arial`;
+        ctx.fillText(layers[i], w/2, h*0.05 + i * layerHeight + layerHeight*0.5);
+    }
+}
+
+
+const animatedCanvases = [
+    { id: 'firewallCanvas', func: animateFirewall },
+    { id: 'vpnCanvas', func: animateVpn },
+    { id: 'wifiCanvas', func: animateWifi },
+    { id: 'portCanvas', func: animatePort },
+    { id: 'tcpUdpCanvas', func: animateTcpUdp }
+];
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const canvasId = entry.target.id;
+            const anim = animatedCanvases.find(c => c.id === canvasId);
+            if (anim) {
+                anim.func();
+                observer.unobserve(entry.target);
+            }
+        }
+    });
+}, { threshold: 0.5 });
+
+
+function redrawAllCanvases() {
     drawIpHouse();
     drawSubnetCity();
     updateCidr();
@@ -2175,10 +2269,26 @@ window.onload = () => {
     drawPort();
     drawTcpUdp();
     drawOsi();
+}
+
+// Initial setup on page load
+window.onload = () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    updateProgressUI();
+    
+    redrawAllCanvases();
+
     renderScoreChart('totalQuizHistory');
 
-    // Initial scroll update
     updateScrollProgress();
+
+    animatedCanvases.forEach(item => {
+        const el = document.getElementById(item.id);
+        if(el) observer.observe(el);
+    });
 };
 </script>
 </body>
