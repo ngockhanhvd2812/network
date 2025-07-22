@@ -58,6 +58,12 @@
             color: var(--primary-color);
         }
 
+        h3 {
+             border-bottom: 2px solid var(--border-color);
+             padding-bottom: 8px;
+             margin-top: 30px;
+        }
+
         .section {
             margin-bottom: 40px;
             padding: 25px;
@@ -79,6 +85,14 @@
             background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
             margin-top: 20px;
         }
+        
+        .case-study {
+            padding: 15px;
+            background-color: color-mix(in srgb, var(--info-color) 15%, transparent);
+            border-left: 4px solid var(--info-color);
+            margin-top: 25px;
+            border-radius: 8px;
+        }
 
         canvas {
             display: block;
@@ -90,7 +104,7 @@
             height: auto;
         }
 
-        input, button, select {
+        input, button, select, textarea {
             padding: 12px;
             margin: 10px 5px;
             font-size: 16px;
@@ -98,9 +112,15 @@
             border: 1px solid var(--border-color);
             background-color: var(--card-bg);
             color: var(--text-color-light);
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 100px;
+            font-family: monospace;
         }
         
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 30%, transparent);
@@ -112,11 +132,30 @@
             border: none;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
+            width: auto;
         }
 
         button:hover {
             background-color: var(--primary-hover);
             transform: translateY(-2px);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+            font-weight: bold;
         }
 
         .result-box {
@@ -128,6 +167,7 @@
             font-size: 16px;
             min-height: 50px;
             border-left: 4px solid var(--success-color);
+            word-wrap: break-word;
         }
 
         .bit-bar {
@@ -155,91 +195,70 @@
             border-left: 4px solid var(--warning-color);
         }
         
-        /* Sidebar */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: var(--card-bg);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid var(--border-color);
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width);
+            height: 100vh; background-color: var(--card-bg);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); padding: 20px;
+            overflow-y: auto; border-right: 1px solid var(--border-color); z-index: 1000;
         }
         .sidebar h2 { margin-top: 0; }
         .sidebar ul { list-style: none; padding: 0; margin: 0; }
         .sidebar li a {
-            display: block;
-            padding: 10px 15px;
-            color: var(--text-color-light);
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            transition: background-color 0.2s;
+            display: block; padding: 10px 15px; color: var(--text-color-light);
+            text-decoration: none; border-radius: 5px; margin-bottom: 5px; transition: background-color 0.2s;
         }
         .sidebar li a:hover { background-color: color-mix(in srgb, var(--primary-color) 10%, transparent); }
         .sidebar li a.active { background-color: var(--primary-color); color: white; font-weight: bold; }
         .sidebar li a.done::before { content: '✔ '; color: var(--success-color); }
 
-        /* Progress Bar */
         .progress-container {
-            width: calc(100% - var(--sidebar-width));
-            background-color: var(--border-color);
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            z-index: 999;
+            width: calc(100% - var(--sidebar-width)); background-color: var(--border-color);
+            position: fixed; top: 0; left: var(--sidebar-width); z-index: 999;
         }
         .progress-bar {
-            height: 8px;
-            width: 0%;
-            background-color: var(--primary-color);
-            transition: width 0.1s linear;
+            height: 8px; width: 0%; background-color: var(--primary-color); transition: width 0.1s linear;
         }
 
-        /* Theme Toggle */
         .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            cursor: pointer; font-size: 20px;
-            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: 20px; right: 20px; background: none;
+            border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px;
+            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Modal */
         .modal {
-            display: none;
-            position: fixed; z-index: 2000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            overflow: auto; background-color: rgba(0,0,0,0.5);
-            align-items: center; justify-content: center;
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
         .modal-content {
-            background-color: var(--card-bg);
-            margin: auto; padding: 30px;
-            border: 1px solid var(--border-color);
-            width: 80%; max-width: 500px;
-            border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
+            background-color: var(--card-bg); margin: auto; padding: 30px;
+            border: 1px solid var(--border-color); width: 80%; max-width: 600px;
+            border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;
             animation: fadeIn 0.3s;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         .close-button {
-            color: var(--secondary-color);
-            position: absolute; top: 10px; right: 20px;
-            font-size: 28px; font-weight: bold;
-            cursor: pointer;
+            color: var(--secondary-color); position: absolute; top: 10px; right: 20px;
+            font-size: 28px; font-weight: bold; cursor: pointer;
         }
         .close-button:hover { color: var(--danger-color); }
+
+        .strength-bar {
+            height: 8px; background-color: var(--border-color);
+            border-radius: 4px; margin-top: 8px; overflow: hidden;
+        }
+        .strength-bar div {
+            height: 100%; width: 0; border-radius: 4px;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        #scoreHistoryChart {
+            margin-top: 20px; padding: 15px;
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+            border-radius: 8px;
+        }
+        #scoreHistoryChart svg { width: 100%; height: 100px; }
+        #scoreHistoryChart .bar { fill: var(--primary-color); transition: height 0.3s; }
+        #scoreHistoryChart .bar:hover { fill: var(--primary-hover); }
         
-        /* Responsive */
         @media (max-width: 992px) {
             body { padding-left: 0; }
             .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
@@ -257,6 +276,7 @@
         <h2>Bài Học</h2>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
         <ul>
+            <li><a href="#intro" id="nav-intro">Giới thiệu chung</a></li>
             <li><a href="#step1" id="nav-step1">Bước 1: IP Address là gì?</a></li>
             <li><a href="#step2" id="nav-step2">Bước 2: Subnet Mask là gì?</a></li>
             <li><a href="#step3" id="nav-step3">Bước 3: Tính toán Subnet</a></li>
@@ -279,16 +299,50 @@
             <li><a href="#step20" id="nav-step20">Bước 20: TCP vs UDP</a></li>
             <li><a href="#step21" id="nav-step21">Bước 21: Mô hình OSI</a></li>
             <li><a href="#step22" id="nav-step22">Bước 22: Quiz tổng hợp</a></li>
+            <li><a href="#further-reading" id="nav-further-reading">Đọc thêm</a></li>
         </ul>
     </nav>
     
     <div class="main-content">
+        <div class="section" id="preface">
+            <h2>Lời nói đầu: Tại sao phải hiểu về Mạng Máy Tính?</h2>
+            <p>Trong thế giới số hiện nay, từ việc lướt web, gửi email, chơi game online đến vận hành các trung tâm dữ liệu khổng lồ của Google, Amazon, tất cả đều dựa trên nền tảng mạng máy tính. Hiểu về địa chỉ IP, Subnet Mask và các khái niệm liên quan không chỉ là kiến thức dành cho chuyên gia IT mà còn là kỹ năng cần thiết cho bất kỳ ai muốn tìm hiểu sâu hơn về công nghệ.</p>
+            <p>Khóa học này sẽ dẫn dắt bạn qua <strong>22 bước</strong>, từ những khái niệm cơ bản nhất như IP là gì cho đến các chủ đề nâng cao như VLSM, IPv6, routing, và bảo mật mạng. Hãy cùng bắt đầu hành trình khám phá xương sống của Internet!</p>
+        </div>
+        
         <h1>Mô Hình Hóa IP và Subnet Mask</h1>
+        
+        <div class="section" id="intro">
+            <h2>Giới Thiệu Chung: IP, MAC, và DNS - Bộ Ba Quyền Lực</h2>
+            <p>Trước khi đi sâu, hãy phân biệt rõ ba khái niệm cốt lõi:</p>
+            <ul>
+                <li><strong>Địa chỉ IP (Logical Address):</strong> Như địa chỉ nhà của bạn, có thể thay đổi nếu bạn chuyển nhà. Nó dùng để định tuyến gói tin trên Internet.</li>
+                <li><strong>Địa chỉ MAC (Physical Address):</strong> Như số Căn cước công dân của thiết bị, là duy nhất và không đổi. Nó dùng để gửi dữ liệu trong mạng nội bộ (LAN).</li>
+                <li><strong>DNS (Domain Name System):</strong> Như danh bạ điện thoại, dịch tên miền (ví dụ: google.com) thành địa chỉ IP để máy tính có thể hiểu và kết nối.</li>
+            </ul>
+            <p><strong>Ví dụ thực tế:</strong> Khi bạn gõ `google.com` vào trình duyệt, máy tính của bạn hỏi DNS server để lấy IP của Google. Sau đó, nó tạo gói tin với IP đích đó và gửi đến router. Router sẽ dùng địa chỉ MAC để chuyển gói tin trong mạng LAN. Quá trình này được điều phối bởi Giao thức phân giải địa chỉ (ARP). Tìm hiểu thêm tại <a href="https://tools.ietf.org/html/rfc826" target="_blank" rel="noopener noreferrer">RFC826 (ARP)</a>.</p>
+        </div>
+
         <div class="section" id="step1">
             <h2>Bước 1: IP Address Là Gì? (Giống Như Địa Chỉ Nhà)</h2>
             <p>Hãy tưởng tượng internet như một thành phố khổng lồ. Mỗi máy tính, điện thoại là một ngôi nhà. Để gửi thư (dữ liệu), cần địa chỉ nhà chính xác. Đó là IP!</p>
             <p>IP IPv4 giống như: <strong>Số nhà. Đường. Phường. Quận</strong> - Nhưng dùng số: xxx.xxx.xxx.xxx (mỗi xxx từ 0-255). Ví dụ: 192.168.1.1.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP 192.168.1.1 giống như "Số 1, Ngõ 1, Phố 168, Quận 192". Phần đầu là khu vực lớn, phần sau là nhà cụ thể.</div>
+            
+            <h3>Phân Lớp Địa Chỉ IPv4 (Khái niệm cũ nhưng hữu ích)</h3>
+            <p>Trước đây, IPv4 được chia thành các lớp để xác định kích thước mạng mặc định. Mặc dù ngày nay CIDR (sẽ học ở bước 2) đã thay thế, hiểu về các lớp vẫn có ích.</p>
+            <table>
+                <thead><tr><th>Lớp</th><th>Dải địa chỉ đầu</th><th>Subnet Mask Mặc định</th><th>Mục đích sử dụng</th></tr></thead>
+                <tbody>
+                    <tr><td>A</td><td>1.0.0.0 – 126.255.255.255</td><td>255.0.0.0 (/8)</td><td>Các mạng rất lớn, ISP</td></tr>
+                    <tr><td>B</td><td>128.0.0.0 – 191.255.255.255</td><td>255.255.0.0 (/16)</td><td>Các mạngขนาดกลางถึงใหญ่</td></tr>
+                    <tr><td>C</td><td>192.0.0.0 – 223.255.255.255</td><td>255.255.255.0 (/24)</td><td>Các mạng nhỏ, mạng gia đình, doanh nghiệp nhỏ</td></tr>
+                    <tr><td>D</td><td>224.0.0.0 – 239.255.255.255</td><td>N/A</td><td>Multicast (gửi đến một nhóm)</td></tr>
+                    <tr><td>E</td><td>240.0.0.0 – 255.255.255.255</td><td>N/A</td><td>Dự trữ, nghiên cứu (Experimental)</td></tr>
+                </tbody>
+            </table>
+            <p><strong>Lưu ý:</strong> Dải 127.x.x.x được dành riêng cho loopback (ví dụ `127.0.0.1` là chính máy tính của bạn).</p>
+
             <h3>Sơ Đồ Minh Họa: Cấu Trúc IP Như Một Ngôi Nhà</h3>
             <canvas id="ipHouseCanvas" width="600" height="300"></canvas>
             <div class="interactive">
@@ -337,6 +391,16 @@
                 <button onclick="checkIpInSubnet()" aria-label="Check if IP is in Subnet">Kiểm Tra</button>
                 <div id="checkResult" class="result-box"></div>
             </div>
+            <div class="case-study">
+               <h3>Case Study: Phân chia mạng cho văn phòng</h3>
+               <p>Một công ty được cấp dải mạng <strong>192.168.0.0/22</strong>. Họ cần chia ra các mạng con cho các phòng ban:</p>
+               <ul>
+                   <li><strong>Phòng Kế toán (50 người):</strong> Cần một subnet. Họ có thể dùng <strong>192.168.1.0/26</strong> (cung cấp 62 host).</li>
+                   <li><strong>Phòng Kỹ thuật (120 người):</strong> Cần subnet lớn hơn. Họ có thể dùng <strong>192.168.2.0/25</strong> (cung cấp 126 host).</li>
+                   <li><strong>Hệ thống Camera IoT (20 thiết bị):</strong> Cần subnet nhỏ. Họ có thể dùng <strong>192.168.3.0/27</strong> (cung cấp 30 host).</li>
+               </ul>
+               <p>Việc chia subnet giúp tăng cường bảo mật (chỉ các thiết bị trong cùng subnet giao tiếp dễ dàng) và dễ dàng quản lý.</p>
+           </div>
         </div>
         <div class="section" id="step4">
             <h2>Bước 4: Quiz Để Kiểm Tra Và Học Thêm</h2>
@@ -375,6 +439,13 @@
         <div class="section" id="step7">
             <h2>Bước 7: IP Public Và Private - Internet Thực Tế</h2>
             <p>IP Private (như 192.168.x.x) dùng trong nhà/mạng nội bộ, không ra internet. IP Public là địa chỉ thật trên internet, do ISP cung cấp.</p>
+            <p>Các dải IP Private được quy định trong RFC 1918:</p>
+            <ul>
+                <li><strong>10.0.0.0 /8</strong> (10.0.0.0 đến 10.255.255.255)</li>
+                <li><strong>172.16.0.0 /12</strong> (172.16.0.0 đến 172.31.255.255)</li>
+                <li><strong>192.168.0.0 /16</strong> (192.168.0.0 đến 192.168.255.255)</li>
+            </ul>
+            <p><strong>Lưu ý đặc biệt:</strong> Nếu máy tính của bạn nhận được IP trong dải <strong>169.254.0.0/16</strong>, đó là địa chỉ APIPA (Automatic Private IP Addressing). Nó có nghĩa là máy tính không thể kết nối đến máy chủ DHCP để nhận IP.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP Private như số phòng trong nhà bạn. IP Public như địa chỉ nhà ngoài đường lớn.</div>
             <h3>Sơ Đồ Minh Họa: Mạng Nội Bộ Và Internet</h3>
             <canvas id="publicPrivateCanvas" width="600" height="300"></canvas>
@@ -399,15 +470,16 @@
         </div>
         <div class="section" id="step9">
             <h2>Bước 9: VLSM - Variable Length Subnet Mask (Subnet Linh Hoạt)</h2>
-            <p>VLSM cho phép chia subnet với kích thước khác nhau, tiết kiệm địa chỉ IP. Thay vì chia đều, bạn có thể có subnet lớn nhỏ tùy nhu cầu.</p>
+            <p>VLSM cho phép chia subnet với kích thước khác nhau, tiết kiệm địa chỉ IP. Thay vì chia đều, bạn có thể có subnet lớn nhỏ tùy nhu cầu. Nguyên tắc quan trọng là <strong>sắp xếp các yêu cầu về số host từ lớn nhất đến nhỏ nhất</strong> trước khi bắt đầu chia mạng.</p>
+            <p>Cách tính prefix cho một số lượng host yêu cầu: `prefix = 32 - ceil(log2(số_host_yêu_cầu + 2))`. Cộng 2 là để dành cho địa chỉ mạng và broadcast.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Chia khu đất thành các phần: một phần lớn cho công viên, phần nhỏ cho nhà ở, tùy theo nhu cầu.</div>
             <h3>Sơ Đồ Minh Họa: VLSM Với Các Subnet Kích Thước Khác Nhau</h3>
             <canvas id="vlsmCanvas" width="600" height="400"></canvas>
             <div class="interactive">
                 <h3>Tương Tác 7: Tính VLSM</h3>
-                <p>Nhập network gốc và các kích thước host cần (cách nhau bởi dấu phẩy, ví dụ: 100,50,20).</p>
+                <p>Nhập network gốc và các kích thước host cần (cách nhau bởi dấu phẩy, ví dụ: 100,50,20). Script sẽ tự động sắp xếp.</p>
                 <input type="text" id="vlsmNetwork" placeholder="Network gốc: 192.168.0.0/16" aria-label="Base network for VLSM"/>
-                <input type="text" id="vlsmHosts" placeholder="Host cần: 100,50,20" aria-label="Required host counts for VLSM"/>
+                <input type="text" id="vlsmHosts" placeholder="Host cần: 100, 50, 20, 5, 2" aria-label="Required host counts for VLSM"/>
                 <button onclick="calculateVLSM()" aria-label="Calculate VLSM">Tính VLSM</button>
                 <div id="vlsmResult" class="result-box"></div>
             </div>
@@ -415,26 +487,40 @@
         <div class="section" id="step10">
             <h2>Bước 10: IPv6 - Thế Hệ IP Mới</h2>
             <p>IPv4 sắp hết địa chỉ, IPv6 dùng 128 bit, dạng hex (ví dụ: 2001:0db8:85a3:0000:0000:8a2e:0370:7334). Nó giải quyết thiếu hụt địa chỉ.</p>
+             <h3>Các Loại Địa Chỉ IPv6 Phổ Biến</h3>
+            <ul>
+                <li><strong>Global Unicast:</strong> Tương tự IP public, có thể định tuyến toàn cầu. Bắt đầu bằng `2000::/3`.</li>
+                <li><strong>Link-Local:</strong> Tự động cấu hình trên mọi giao diện, chỉ dùng trong mạng LAN. Bắt đầu bằng `fe80::/10`.</li>
+                <li><strong>Unique Local:</strong> Tương tự IP private, dùng trong mạng nội bộ. Bắt đầu bằng `fc00::/7`.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IPv4 như số điện thoại 10 chữ số sắp hết, IPv6 như số dài hơn để có nhiều hơn.</div>
             <h3>Sơ Đồ Minh Họa: So Sánh IPv4 Và IPv6</h3>
             <canvas id="ipv6Canvas" width="600" height="300"></canvas>
             <div class="interactive">
-                <h3>Tương Tác 8: Chuyển IPv4 Sang IPv6 (Mapped)</h3>
-                <input type="text" id="ipv4ToIpv6" placeholder="Nhập IPv4: 192.168.1.1" aria-label="IPv4 to map to IPv6"/>
-                <button onclick="mapIpv4ToIpv6()" aria-label="Map IPv4 to IPv6">Chuyển Sang IPv6</button>
-                <div id="ipv6Result" class="result-box"></div>
+                <h3>Tương Tác 8: Rút Gọn Địa Chỉ IPv6</h3>
+                <p>IPv6 cho phép rút gọn bằng cách bỏ các số 0 đứng đầu trong mỗi khối và thay thế một chuỗi số 0 liên tiếp dài nhất bằng `::`.</p>
+                <input type="text" id="ipv6ToCompress" placeholder="VD: 2001:0db8:0000:0000:1234:0000:0000:5678" aria-label="IPv6 to compress"/>
+                <button onclick="compressIpv6()" aria-label="Compress IPv6">Rút Gọn</button>
+                <div id="ipv6CompressedResult" class="result-box"></div>
             </div>
         </div>
         <div class="section" id="step11">
             <h2>Bước 11: NAT - Network Address Translation</h2>
             <p>NAT cho phép nhiều thiết bị dùng IP private chia sẻ một IP public để ra internet.</p>
+            <h3>Các loại NAT</h3>
+            <ul>
+                <li><strong>SNAT (Source NAT):</strong> Thay đổi địa chỉ IP nguồn của gói tin đi ra ngoài. Đây là loại NAT phổ biến nhất cho mạng gia đình/văn phòng.</li>
+                <li><strong>DNAT (Destination NAT) / Port Forwarding:</strong> Thay đổi địa chỉ IP đích của gói tin đi vào. Dùng để public một dịch vụ nội bộ (như web server) ra internet.</li>
+                <li><strong>PAT (Port Address Translation):</strong> Một dạng SNAT, map nhiều IP private ra một IP public duy nhất bằng cách sử dụng các port khác nhau. Ví dụ: `192.168.1.10:12345` và `192.168.1.11:54321` đều được map ra `203.0.113.1` nhưng với các port nguồn khác nhau.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như một người đại diện (router) nhận thư từ bên ngoài và phân phát cho các phòng trong nhà.</div>
             <h3>Sơ Đồ Minh Họa: NAT Trong Mạng Gia Đình</h3>
             <canvas id="natCanvas" width="600" height="400"></canvas>
         </div>
         <div class="section" id="step12">
             <h2>Bước 12: DHCP - Dynamic Host Configuration Protocol (Gán IP Tự Động)</h2>
-            <p>DHCP tự động gán IP, subnet mask, gateway cho thiết bị khi kết nối mạng, thay vì gán thủ công.</p>
+            <p>DHCP tự động gán IP, subnet mask, gateway cho thiết bị khi kết nối mạng. Quá trình này gọi là <strong>DORA</strong>: Discover, Offer, Request, Acknowledge.</p>
+            <p>IP được cấp trong một khoảng thời gian gọi là <strong>Lease Time</strong>. Hết nửa thời gian, client sẽ cố gắng gia hạn (renew). Nếu thất bại, nó sẽ thử lại khi còn 87.5% thời gian (rebinding).</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như quầy lễ tân khách sạn tự động gán phòng khi bạn check-in, thay vì chọn phòng thủ công.</div>
             <h3>Sơ Đồ Minh Họa: Quá Trình DHCP</h3>
             <canvas id="dhcpCanvas" width="600" height="300"></canvas>
@@ -442,27 +528,48 @@
                 <h3>Tương Tác 9: Mô Phỏng Yêu Cầu IP Từ DHCP</h3>
                 <p>Nhập "MAC Address" (giả, bất kỳ) và nhấn để nhận IP tự động từ pool 192.168.1.0/24.</p>
                 <input type="text" id="macInput" placeholder="MAC: 00:11:22:33:44:55" aria-label="Simulated MAC Address"/>
+                <label for="leaseTimeSlider">Lease Time (giây): <span id="leaseTimeValue">86400</span></label>
+                <input type="range" id="leaseTimeSlider" min="60" max="604800" value="86400" step="60" oninput="document.getElementById('leaseTimeValue').textContent = this.value" aria-label="Lease Time Slider" />
                 <button onclick="requestDhcpIp()" aria-label="Request DHCP IP">Yêu Cầu IP</button>
                 <div id="dhcpResult" class="result-box"></div>
             </div>
         </div>
         <div class="section" id="step13">
             <h2>Bước 13: DNS - Domain Name System (Chuyển Tên Miền Sang IP)</h2>
-            <p>DNS như sổ danh bạ, chuyển tên miền (ví dụ google.com) thành IP để máy tính kết nối.</p>
+            <p>DNS như sổ danh bạ, chuyển tên miền (ví dụ google.com) thành IP để máy tính kết nối. Có nhiều loại bản ghi (record) DNS:</p>
+            <ul>
+                <li><strong>A Record:</strong> Map tên miền sang địa chỉ IPv4.</li>
+                <li><strong>AAAA Record:</strong> Map tên miền sang địa chỉ IPv6.</li>
+                <li><strong>CNAME Record (Canonical Name):</strong> Tạo bí danh cho một tên miền khác.</li>
+                <li><strong>MX Record (Mail Exchange):</strong> Chỉ định máy chủ email cho tên miền.</li>
+                <li><strong>TXT Record:</strong> Chứa thông tin dạng văn bản, thường dùng để xác thực.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Gọi tên bạn bè thay vì số điện thoại, DNS tìm số cho bạn.</div>
             <h3>Sơ Đồ Minh Họa: Quá Trình Resolve DNS</h3>
             <canvas id="dnsCanvas" width="600" height="300"></canvas>
             <div class="interactive">
                 <h3>Tương Tác 10: Mô Phỏng Resolve Tên Miền</h3>
-                <p>Nhập tên miền (giả), nhận IP ngẫu nhiên.</p>
+                <p>Chọn loại bản ghi, nhập tên miền và xem kết quả (giả).</p>
+                <select id="dnsRecordType" aria-label="DNS Record Type">
+                    <option value="A">A (IPv4)</option>
+                    <option value="AAAA">AAAA (IPv6)</option>
+                    <option value="MX">MX (Mail)</option>
+                    <option value="CNAME">CNAME (Alias)</option>
+                    <option value="TXT">TXT (Text)</option>
+                </select>
                 <input type="text" id="domainInput" placeholder="Tên miền: example.com" aria-label="Domain name to resolve"/>
-                <button onclick="resolveDns()" aria-label="Resolve Domain">Resolve</button>
-                <div id="dnsResult" class="result-box"></div>
+                <button onclick="resolveDnsRecord()" aria-label="Resolve Domain">Resolve</button>
+                <div id="dnsRecordResult" class="result-box"></div>
             </div>
         </div>
         <div class="section" id="step14">
             <h2>Bước 14: Routing Cơ Bản (Định Tuyến Dữ Liệu)</h2>
             <p>Routing là cách dữ liệu đi từ mạng này sang mạng khác, qua router dựa trên bảng định tuyến.</p>
+            <h3>Static vs. Dynamic Routing</h3>
+            <ul>
+                <li><strong>Static Routing:</strong> Người quản trị phải cấu hình đường đi thủ công. Phù hợp cho mạng nhỏ, đơn giản. Ví dụ lệnh trên router Cisco: `ip route 0.0.0.0 0.0.0.0 192.168.1.1` (gửi mọi traffic không xác định đến gateway 192.168.1.1).</li>
+                <li><strong>Dynamic Routing:</strong> Các router tự động chia sẻ thông tin và tìm đường đi tốt nhất bằng các giao thức như OSPF, BGP. Phù hợp cho mạng lớn, phức tạp.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như bản đồ GPS hướng dẫn đường đi từ nhà bạn đến nhà bạn bè, qua các ngã rẽ (router).</div>
             <h3>Sơ Đồ Minh Họa: Định Tuyến Giữa Các Mạng</h3>
             <canvas id="routingCanvas" width="600" height="400"></canvas>
@@ -479,22 +586,40 @@
         <div class="section" id="step15">
             <h2>Bước 15: Firewall Và Bảo Mật Mạng</h2>
             <p>Firewall như tường lửa, kiểm soát lưu lượng dữ liệu vào/ra mạng, chặn các kết nối nguy hiểm dựa trên quy tắc (IP, port).</p>
+            <h3>Stateful vs. Stateless Firewall</h3>
+            <ul>
+                <li><strong>Stateless:</strong> Kiểm tra từng gói tin một cách độc lập, không nhớ các kết nối trước đó. Nhanh nhưng kém an toàn.</li>
+                <li><strong>Stateful:</strong> Theo dõi trạng thái của các kết nối (ví dụ: TCP handshake). Chỉ cho phép các gói tin thuộc một kết nối hợp lệ đi qua. An toàn hơn nhưng tốn tài nguyên hơn.</li>
+            </ul>
+            <p><strong>Thứ tự luật rất quan trọng:</strong> Firewall xử lý luật từ trên xuống dưới và dừng lại ở luật đầu tiên khớp. Thường có một luật "Default Deny" ở cuối cùng để chặn mọi thứ không được cho phép rõ ràng.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như bảo vệ cửa nhà, chỉ cho người quen vào, chặn kẻ lạ.</div>
             <h3>Sơ Đồ Minh Họa Động: Mô Phỏng Firewall Chặn Kết Nối</h3>
             <canvas id="firewallCanvas" width="600" height="400"></canvas>
             <button onclick="animateFirewall()" aria-label="Run Firewall Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
-                <h3>Tương Tác 12: Thiết Lập Quy Tắc Firewall</h3>
-                <p>Nhập IP nguồn và port, xem firewall cho phép hay chặn (quy tắc giả: chặn IP bắt đầu bằng 10., port 80).</p>
-                <input type="text" id="fwIp" placeholder="IP nguồn: 10.0.0.1" aria-label="Source IP for firewall check" />
-                <input type="number" id="fwPort" placeholder="Port: 80" aria-label="Port for firewall check"/>
-                <button onclick="checkFirewall()" aria-label="Check Firewall Rule">Kiểm Tra</button>
-                <div id="fwResult" class="result-box"></div>
+                <h3>Tương Tác 12: Thiết Lập Quy Tắc Firewall (JSON)</h3>
+                <p>Soạn thảo một mảng các quy tắc bằng JSON. Nhập IP nguồn và port để kiểm tra.</p>
+                <textarea id="firewallRules" aria-label="Firewall rules in JSON format">[
+{ "action": "allow", "protocol": "tcp", "port": 443, "description": "Allow HTTPS" },
+{ "action": "allow", "source_ip": "192.168.1.100", "description": "Allow Admin PC" },
+{ "action": "deny", "source_ip": "10.0.0.0/8", "description": "Block internal network" },
+{ "action": "deny", "protocol": "any", "description": "Default Deny" }
+]</textarea>
+                <input type="text" id="firewallCheckIp" placeholder="IP nguồn để kiểm tra: 10.1.2.3" aria-label="Source IP for firewall check" />
+                 <input type="number" id="firewallCheckPort" placeholder="Port để kiểm tra: 443" aria-label="Port for firewall check" />
+                <button onclick="checkFirewallRules()" aria-label="Check Firewall Rule">Kiểm Tra Với Luật JSON</button>
+                <div id="firewallJsonResult" class="result-box"></div>
             </div>
         </div>
         <div class="section" id="step16">
             <h2>Bước 16: VPN - Virtual Private Network (Mạng Riêng Ảo)</h2>
             <p>VPN tạo đường hầm an toàn qua internet, mã hóa dữ liệu, cho phép truy cập mạng từ xa như đang ở văn phòng.</p>
+             <h3>Các Loại VPN</h3>
+            <ul>
+                <li><strong>Remote-Access VPN:</strong> Cho phép người dùng cá nhân kết nối vào mạng công ty.</li>
+                <li><strong>Site-to-Site VPN:</strong> Kết nối hai hoặc nhiều mạng văn phòng với nhau qua Internet.</li>
+                <li><strong>Giao thức:</strong> IPsec là một bộ giao thức mạnh mẽ, thường dùng cho site-to-site. SSL/TLS VPN thường dễ sử dụng hơn, chạy qua trình duyệt hoặc client, phù hợp cho remote-access.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như đường hầm bí mật kết nối nhà bạn với công ty, an toàn khỏi kẻ xấu ngoài đường.</div>
             <h3>Sơ Đồ Minh Họa Động: Kết Nối VPN</h3>
             <canvas id="vpnCanvas" width="600" height="300"></canvas>
@@ -502,6 +627,10 @@
             <div class="interactive">
                 <h3>Tương Tác 13: Mô Phỏng Kết Nối VPN</h3>
                 <p>Nhập "Server VPN" và "User IP", nhấn để "kết nối" và xem địa chỉ thay đổi (giả).</p>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label><input type="radio" name="vpnType" value="IPsec" checked> IPsec VPN</label>
+                    <label><input type="radio" name="vpnType" value="SSL" style="margin-left: 20px;"> SSL VPN</label>
+                </div>
                 <input type="text" id="vpnServer" placeholder="Server VPN: vpn.example.com" aria-label="VPN Server Address"/>
                 <input type="text" id="userIp" placeholder="User IP: 192.168.1.10" aria-label="User IP for VPN"/>
                 <button onclick="connectVpn()" aria-label="Connect VPN">Kết Nối VPN</button>
@@ -510,16 +639,25 @@
         </div>
         <div class="section" id="step17">
             <h2>Bước 17: Wi-Fi Và Mạng Không Dây</h2>
-            <p>Wi-Fi dùng sóng radio để kết nối thiết bị không dây, với SSID (tên mạng) và mật khẩu để bảo mật.</p>
+            <p>Wi-Fi dùng sóng radio để kết nối thiết bị không dây. Bảo mật là yếu tố quan trọng nhất.</p>
+             <h3>Các Chuẩn Bảo Mật Wi-Fi</h3>
+            <ul>
+                <li><strong>WEP (Wired Equivalent Privacy):</strong> Cũ và rất yếu, không nên sử dụng.</li>
+                <li><strong>WPA (Wi-Fi Protected Access):</strong> Tốt hơn WEP nhưng vẫn có lỗ hổng.</li>
+                <li><strong>WPA2:</strong> Chuẩn phổ biến và an toàn trong nhiều năm, sử dụng mã hóa AES mạnh.</li>
+                <li><strong>WPA3:</strong> Thế hệ mới nhất, tăng cường bảo mật, chống lại các cuộc tấn công Brute-force.</li>
+            </ul>
+            <p>Luôn sử dụng WPA2 hoặc WPA3 với một mật khẩu mạnh (dài, phức tạp, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt).</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như radio FM, bạn chọn kênh (SSID) và mật khẩu để nghe riêng.</div>
             <h3>Sơ Đồ Minh Họa Động: Kết Nối Wi-Fi</h3>
             <canvas id="wifiCanvas" width="600" height="400"></canvas>
             <button onclick="animateWifi()" aria-label="Run Wi-Fi Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 14: Mô Phỏng Kết Nối Wi-Fi</h3>
-                <p>Nhập SSID và mật khẩu (giả: SSID 'MyWiFi', mật khẩu '123456'), nhấn để kết nối.</p>
+                <p>Nhập SSID và mật khẩu (giả: SSID 'MyWiFi', mật khẩu '12345678'), nhấn để kết nối.</p>
                 <input type="text" id="ssidInput" placeholder="SSID: MyWiFi" aria-label="Wi-Fi SSID"/>
-                <input type="password" id="wifiPass" placeholder="Mật khẩu: 123456" aria-label="Wi-Fi Password"/>
+                <input type="password" id="wifiPass" placeholder="Mật khẩu" aria-label="Wi-Fi Password" oninput="checkPasswordStrength(this.value)"/>
+                <div class="strength-bar"><div id="passwordStrength"></div></div>
                 <button onclick="connectWifi()" aria-label="Connect to Wi-Fi">Kết Nối</button>
                 <div id="wifiResult" class="result-box"></div>
             </div>
@@ -532,8 +670,8 @@
                 <select id="quiz6" aria-label="Final quiz question 1"><option value="">Chọn...</option><option value="chặn">Chặn lưu lượng nguy hiểm</option><option value="gán ip">Gán IP tự động</option><option value="resolve">Resolve tên miền</option></select>
                 <p>Câu 2: VPN dùng để?</p>
                 <select id="quiz7" aria-label="Final quiz question 2"><option value="">Chọn...</option><option value="mã hóa">Mã hóa kết nối an toàn</option><option value="chia subnet">Chia subnet</option><option value="kết nối không dây">Kết nối không dây</option></select>
-                <p>Câu 3: Wi-Fi cần gì để kết nối an toàn?</p>
-                <select id="quiz8" aria-label="Final quiz question 3"><option value="">Chọn...</option><option value="ssid pass">SSID và mật khẩu</option><option value="ip public">IP public</option><option value="cidr">CIDR</option></select>
+                <p>Câu 3: Chuẩn bảo mật Wi-Fi nào nên dùng hiện nay?</p>
+                <select id="quiz8" aria-label="Final quiz question 3"><option value="">Chọn...</option><option value="wpa23">WPA2 hoặc WPA3</option><option value="wep">WEP</option><option value="wpa">WPA</option></select>
                 <button onclick="checkFinalQuiz()" aria-label="Check Final Quiz Answers">Kiểm Tra</button>
                 <div id="finalQuizResult" class="result-box"></div>
             </div>
@@ -541,13 +679,19 @@
         <div class="section" id="step19">
             <h2>Bước 19: Port Và Socket (Cửa Vào Ra Dữ Liệu)</h2>
             <p>Port như số phòng trong tòa nhà (IP là địa chỉ tòa nhà). Socket là kết hợp IP + Port, giúp dữ liệu đến đúng ứng dụng (web port 80, email port 25).</p>
+            <h3>Các Dải Port</h3>
+            <ul>
+                <li><strong>0-1023 (Well-known Ports):</strong> Được dành riêng cho các dịch vụ hệ thống (HTTP: 80, FTP: 21, SSH: 22).</li>
+                <li><strong>1024-49151 (Registered Ports):</strong> Dành cho các ứng dụng của người dùng đã đăng ký.</li>
+                <li><strong>49152-65535 (Dynamic/Private/Ephemeral Ports):</strong> Được hệ điều hành sử dụng cho các kết nối đi ra ngoài (client-side).</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP là địa chỉ nhà, port là số phòng, socket là "nhà + phòng" để gửi thư đúng người.</div>
             <h3>Sơ Đồ Minh Họa Động: Dữ Liệu Đi Qua Port</h3>
             <canvas id="portCanvas" width="600" height="300"></canvas>
             <button onclick="animatePort()" aria-label="Run Port Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 15: Kiểm Tra Dịch Vụ Port</h3>
-                <p>Nhập số port (0-65535), xem dịch vụ phổ biến (giả).</p>
+                <p>Nhập số port (0-65535), xem dịch vụ phổ biến.</p>
                 <input type="number" id="portInput" placeholder="Port: 80" min="0" max="65535" aria-label="Port number to check"/>
                 <button onclick="checkPort()" aria-label="Check Port Service">Kiểm Tra</button>
                 <div id="portResult" class="result-box"></div>
@@ -556,14 +700,15 @@
         <div class="section" id="step20">
             <h2>Bước 20: TCP vs UDP - Giao Thức Truyền Dữ Liệu</h2>
             <p>TCP an toàn, đáng tin cậy (như gọi điện xác nhận), UDP nhanh, không xác nhận (như gửi thư thường, dùng cho video/game).</p>
+            <p>Ngoài ra còn có các giao thức mới hơn như <strong>QUIC</strong> (dùng bởi HTTP/3), kết hợp tốc độ của UDP và độ tin cậy của TCP; và <strong>SCTP</strong>, dùng cho viễn thông (signaling).</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> TCP như chuyển phát nhanh có biên nhận, UDP như phát tờ rơi nhanh nhưng có thể mất.</div>
             <h3>Sơ Đồ Minh Họa Động: So Sánh TCP/UDP</h3>
             <canvas id="tcpUdpCanvas" width="600" height="400"></canvas>
             <button onclick="animateTcpUdp()" aria-label="Run TCP vs UDP Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 16: Chọn Giao Thức Cho Ứng Dụng</h3>
-                <p>Nhập ứng dụng (web, video, email), xem nên dùng TCP hay UDP.</p>
-                <input type="text" id="appInput" placeholder="Ứng dụng: web" aria-label="Application type to suggest protocol"/>
+                <p>Nhập ứng dụng (web, video, email, game, voice call), xem nên dùng TCP, UDP hay QUIC.</p>
+                <input type="text" id="appInput" placeholder="Ứng dụng: video call" aria-label="Application type to suggest protocol"/>
                 <button onclick="suggestProtocol()" aria-label="Suggest Protocol">Gợi Ý</button>
                 <div id="protocolResult" class="result-box"></div>
             </div>
@@ -571,21 +716,34 @@
         <div class="section" id="step21">
             <h2>Bước 21: Mô Hình OSI - Các Tầng Mạng</h2>
             <p>OSI có 7 tầng, từ Physical (cáp) đến Application (app). Giúp hiểu dữ liệu đi từ tầng này sang tầng khác.</p>
+            <h3>Mapping Giao Thức Lên Các Tầng</h3>
+            <ul>
+                <li><strong>Layer 7 (Application):</strong> HTTP, FTP, SMTP, DNS</li>
+                <li><strong>Layer 4 (Transport):</strong> TCP, UDP, QUIC</li>
+                <li><strong>Layer 3 (Network):</strong> IP, ICMP</li>
+                <li><strong>Layer 2 (Data Link):</strong> Ethernet, MAC Address, ARP</li>
+                <li><strong>Layer 1 (Physical):</strong> Cáp đồng, cáp quang, sóng radio</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như gửi thư: viết thư (Application), đóng gói (Presentation), địa chỉ (Session), vận chuyển (Transport), đường đi (Network), xe chở (Data Link), đường phố (Physical).</div>
             <h3>Sơ Đồ Minh Họa Động: Các Tầng OSI</h3>
             <canvas id="osiCanvas" width="600" height="500"></canvas>
-            <button onclick="animateOsi()" aria-label="Run OSI Model Animation">Chạy Minh Họa Động</button>
             <div class="interactive">
                 <h3>Tương Tác 17: Khám Phá Tầng OSI</h3>
-                <p>Chọn tầng (1-7), xem mô tả và ví dụ.</p>
-                <select id="osiLayer" aria-label="OSI Layer selector"><option value="">Chọn tầng...</option><option value="1">1: Physical</option><option value="2">2: Data Link</option><option value="3">3: Network</option><option value="4">4: Transport</option><option value="5">5: Session</option><option value="6">6: Presentation</option><option value="7">7: Application</option></select>
-                <button onclick="describeOsiLayer()" aria-label="Describe OSI Layer">Mô Tả</button>
+                <p>Chọn một giao thức, xem nó nằm ở tầng nào.</p>
+                <select id="osiProtocolSelect" aria-label="OSI Protocol selector">
+                    <option value="">Chọn giao thức...</option>
+                    <option value="7">HTTP</option><option value="7">DNS</option>
+                    <option value="4">TCP</option><option value="4">UDP</option>
+                    <option value="3">IP</option><option value="3">ICMP</option>
+                    <option value="2">Ethernet (MAC)</option><option value="2">ARP</option>
+                </select>
+                <button onclick="highlightOsiLayer()" aria-label="Highlight OSI Layer">Highlight Tầng</button>
                 <div id="osiResult" class="result-box"></div>
             </div>
         </div>
         <div class="section" id="step22">
             <h2>Bước 22: Quiz Tổng Hợp</h2>
-            <p>Thử quiz để kiểm tra kiến thức từ bước 15-21!</p>
+            <p>Thử quiz để kiểm tra kiến thức từ bước 15-21! Kết quả sẽ được lưu lại để bạn theo dõi tiến độ.</p>
             <div class="interactive">
                 <p>Câu 1: Port 80 dùng cho gì?</p>
                 <select id="quiz9" aria-label="Comprehensive quiz question 1"><option value="">Chọn...</option><option value="http">HTTP (Web)</option><option value="email">Email</option><option value="ftp">FTP</option></select>
@@ -595,7 +753,19 @@
                 <select id="quiz11" aria-label="Comprehensive quiz question 3"><option value="">Chọn...</option><option value="network">Network (IP)</option><option value="physical">Physical</option><option value="application">Application</option></select>
                 <button onclick="checkTotalQuiz()" aria-label="Check Comprehensive Quiz Answers">Kiểm Tra</button>
                 <div id="totalQuizResult" class="result-box"></div>
+                <div id="scoreHistoryChart"></div>
             </div>
+        </div>
+        
+        <div class="section" id="further-reading">
+            <h2>Đọc Thêm và Tài Liệu Tham Khảo</h2>
+            <p>Kiến thức là vô tận. Nếu bạn muốn tìm hiểu sâu hơn, đây là một số tài liệu tham khảo hữu ích:</p>
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/Subnetwork" target="_blank" rel="noopener noreferrer">Wikipedia: Subnetwork</a> - Giải thích chi tiết về subnetting.</li>
+                <li><a href="https://docs.microsoft.com/en-us/windows-server/networking/technologies/dhcp/dhcp-top" target="_blank" rel="noopener noreferrer">Microsoft Docs: DHCP</a> - Tài liệu chính thức về DHCP từ Microsoft.</li>
+                <li><a href="https://www.cloudflare.com/learning/dns/dns-records/" target="_blank" rel="noopener noreferrer">Cloudflare: DNS Records</a> - Giải thích các loại bản ghi DNS.</li>
+                 <li><a href="https://www.ciscopress.com/topics/networking" target="_blank" rel="noopener noreferrer">Cisco Press Networking</a> - Nguồn tài liệu chuyên sâu từ Cisco.</li>
+            </ul>
         </div>
     </div>
 
@@ -627,7 +797,6 @@ function updateScrollProgress() {
     const scrollProgress = (scrollTop / scrollHeight) * 100;
     progressBar.style.width = scrollProgress + '%';
 
-    // Highlight active sidebar link
     let currentSection = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
@@ -649,6 +818,8 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
     localStorage.setItem('theme', theme);
+    // Redraw canvases on theme change if needed
+    window.onload();
 }
 
 function toggleTheme() {
@@ -697,7 +868,7 @@ window.addEventListener('click', (event) => {
 });
 
 
-// --- OLD SCRIPT (MODIFIED FOR MODAL AND PROGRESS) ---
+// --- OLD SCRIPT (MODIFIED AND EXPANDED) ---
 
 // Helper function to convert number to IP string
 function numToIp(num) {
@@ -709,7 +880,8 @@ function drawIpHouse() {
     const canvas = document.getElementById('ipHouseCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ thành phố
     ctx.fillStyle = '#ffc107';
@@ -732,7 +904,7 @@ function drawIpHouse() {
     ctx.font = '16px Arial';
     ctx.fillText('IP: 192.168.1.1', 240, 220);
     // Chú thích
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '14px Arial';
     ctx.fillText('Phần đầu: Quận/Phường (Network)', 50, 270);
     ctx.fillText('Phần sau: Số nhà (Host)', 350, 270);
@@ -749,6 +921,7 @@ function convertToBinary() {
     }
     const binary = parts.map(p => p.toString(2).padStart(8, '0')).join(' . ');
     resultDiv.innerHTML = `<p>Nhị Phân: <strong>${binary}</strong></p><p>Đây là cách máy tính đọc IP đấy!</p>`;
+    saveProgress('step1');
 }
 
 // Vẽ subnet như khu phố
@@ -756,13 +929,14 @@ function drawSubnetCity() {
     const canvas = document.getElementById('subnetCityCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ khu phố lớn
     ctx.strokeStyle = '#dc3545';
     ctx.lineWidth = 3;
     ctx.strokeRect(50, 50, 500, 300);
-    ctx.fillStyle = '#343a40';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '20px Arial';
     ctx.fillText('Thành Phố Lớn (Mạng Chính)', 150, 40);
     // Vẽ subnet nhỏ
@@ -778,7 +952,7 @@ function drawSubnetCity() {
         ctx.fillText('Nhà', 125 + i * 60, 170);
     }
     // Chú thích
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '14px Arial';
     ctx.fillText('Subnet Mask chia khu lớn thành nhỏ, dễ quản lý hơn.', 50, 370);
 }
@@ -799,18 +973,20 @@ function updateCidr() {
     const hosts = Math.pow(2, 32 - cidr);
     const availableHosts = (hosts > 2) ? hosts - 2 : 0;
     document.getElementById('hostCount').textContent = availableHosts.toLocaleString();
+    if(parseInt(cidr) !== 24) saveProgress('step2'); // Mark as done if they interact
     drawAddressRange(cidr);
 }
 
 // Vẽ dải địa chỉ
-function drawAddressRange(cidr) {
+function drawAddressRange(cidr = 24) {
     const canvas = document.getElementById('addressRangeCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
+    const theme = document.documentElement.getAttribute('data-theme');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#f8f9fa';
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Vẽ thanh dải
+    
     ctx.fillStyle = '#e9ecef';
     ctx.fillRect(50, 80, 500, 20);
     ctx.fillStyle = '#007bff';
@@ -818,7 +994,7 @@ function drawAddressRange(cidr) {
     ctx.fillStyle = '#28a745';
     ctx.fillRect(50 + (cidr / 32) * 500, 80, ((32 - cidr) / 32) * 500, 20);
 
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '16px Arial';
     ctx.fillText('Dải Địa Chỉ Toàn Bộ (32 bit)', 150, 50);
     ctx.fillText('Phần Khu Phố (Network)', 60, 120);
@@ -859,6 +1035,7 @@ function calculateSubnet() {
         <p><strong>Host cuối cùng:</strong> ${cidr < 31 ? numToIp(broadcastNum - 1) : 'N/A'}</p>
         <p><strong>Số Host khả dụng:</strong> ${availableHosts.toLocaleString()}</p>
     `;
+    saveProgress('step3');
 }
 
 // Kiểm tra IP trong subnet
@@ -931,12 +1108,30 @@ function checkFinalQuiz() {
     let feedback = '<ul>';
     if (ans6 === 'chặn') { score++; feedback += '<li style="color:green;">Câu 1 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 1 sai: Firewall lọc và chặn lưu lượng nguy hiểm.</li>'; }
     if (ans7 === 'mã hóa') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: VPN tạo kết nối mã hóa an toàn qua internet.</li>'; }
-    if (ans8 === 'ssid pass') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Wi-Fi cần SSID và mật khẩu để kết nối an toàn.</li>'; }
+    if (ans8 === 'wpa23') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Nên dùng WPA2 hoặc WPA3 để bảo mật Wi-Fi.</li>'; }
     feedback += '</ul>';
     const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
     showModal(resultMessage);
     if (score === 3) saveProgress('step18');
 }
+
+function renderScoreChart(quizId) {
+    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
+    const chartDiv = document.getElementById('scoreHistoryChart');
+    if (!history.length || !chartDiv) return;
+
+    const maxScore = 3; 
+    const barWidth = 100 / history.length;
+    let svgContent = `<svg viewBox="0 0 100 ${maxScore}" preserveAspectRatio="none">`;
+    history.forEach((score, index) => {
+        const height = score.score;
+        const x = index * barWidth;
+        svgContent += `<rect class="bar" x="${x}%" y="${maxScore - height}" width="${barWidth - 2}%" height="${height}"><title>Điểm: ${score.score}/${maxScore} - Ngày: ${new Date(score.date).toLocaleString()}</title></rect>`;
+    });
+    svgContent += '</svg>';
+    chartDiv.innerHTML = `<h4>Lịch sử Quiz:</h4>${svgContent}`;
+}
+
 
 function checkTotalQuiz() {
     const ans9 = document.getElementById('quiz9').value;
@@ -948,18 +1143,29 @@ function checkTotalQuiz() {
     if (ans10 === 'udp') { score++; feedback += '<li style="color:green;">Câu 2 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 2 sai: Video streaming ưu tiên tốc độ nên dùng UDP.</li>'; }
     if (ans11 === 'network') { score++; feedback += '<li style="color:green;">Câu 3 đúng!</li>'; } else { feedback += '<li style="color:red;">Câu 3 sai: Tầng 3 (Network) xử lý địa chỉ IP và định tuyến.</li>'; }
     feedback += '</ul>';
+    
+    // Save score
+    const quizId = 'totalQuizHistory';
+    const history = JSON.parse(localStorage.getItem(quizId) || '[]');
+    history.push({ score: score, date: new Date() });
+    if(history.length > 10) history.shift(); // keep last 10 scores
+    localStorage.setItem(quizId, JSON.stringify(history));
+
     const resultMessage = `<h3>Kết quả: Bạn đúng ${score}/3 câu!</h3> ${feedback}`;
     showModal(resultMessage);
     if (score === 3) saveProgress('step22');
+    renderScoreChart(quizId);
 }
 
+// --- NEW AND EXPANDED FUNCTIONS ---
 
 // Vẽ mô phỏng mạng
 function drawNetworkSimulation() {
     const canvas = document.getElementById('networkSimulationCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ router
     ctx.fillStyle = '#007bff';
@@ -969,7 +1175,7 @@ function drawNetworkSimulation() {
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
     ctx.fillText('Router', 365, 105);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '14px Arial';
     ctx.fillText('IP: 192.168.1.1/24', 350, 140);
     // Vẽ hosts
@@ -982,7 +1188,7 @@ function drawNetworkSimulation() {
         ctx.fillStyle = 'white';
         ctx.font = '16px Arial';
         ctx.fillText('Host', host.x - 20, host.y + 5);
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
         ctx.font = '12px Arial';
         ctx.fillText(`IP: ${host.ip}`, host.x - 40, host.y + 50);
         // Kết nối
@@ -1002,9 +1208,10 @@ function drawSubnetting() {
     const canvas = document.getElementById('subnettingCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.font = '20px Arial';
     // Vẽ mạng lớn
     ctx.strokeStyle = '#dc3545';
@@ -1062,6 +1269,7 @@ function calculateSubnets() {
     }
     output += '</ul>';
     resultDiv.innerHTML = output;
+    saveProgress('step6');
 }
 
 // Vẽ public private
@@ -1069,7 +1277,8 @@ function drawPublicPrivate() {
     const canvas = document.getElementById('publicPrivateCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ private network
     ctx.fillStyle = '#28a745';
@@ -1090,7 +1299,7 @@ function drawPublicPrivate() {
     ctx.moveTo(250, 150);
     ctx.lineTo(370, 150);
     ctx.stroke();
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Router (NAT)', 280, 170);
 }
 
@@ -1103,8 +1312,16 @@ function checkIpType() {
         resultDiv.innerHTML = '<p style="color:red;">IP không hợp lệ!</p>';
         return;
     }
-    const isPrivate = (parts[0] === 10) || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) || (parts[0] === 192 && parts[1] === 168);
-    resultDiv.innerHTML = `<p style="font-weight: bold;">${isPrivate ? 'Đây là IP Private' : 'Đây là IP Public'}</p>`;
+    let type = 'Public';
+    if ((parts[0] === 10) || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) || (parts[0] === 192 && parts[1] === 168)) {
+        type = 'Private (RFC 1918)';
+    } else if (parts[0] === 169 && parts[1] === 254) {
+        type = 'APIPA/Link-Local';
+    } else if (parts[0] === 127) {
+        type = 'Loopback';
+    }
+    resultDiv.innerHTML = `<p style="font-weight: bold;">Đây là IP <strong>${type}</strong></p>`;
+    saveProgress('step7');
 }
 
 // Vẽ VLSM
@@ -1112,25 +1329,26 @@ function drawVlsm() {
     const canvas = document.getElementById('vlsmCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ mạng lớn
     ctx.strokeStyle = '#dc3545';
     ctx.lineWidth = 3;
     ctx.strokeRect(50, 50, 500, 50);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Mạng Gốc /16', 250, 40);
     // Vẽ subnet khác kích thước
     ctx.strokeStyle = '#007bff';
     ctx.strokeRect(50, 150, 300, 50);
-    ctx.fillText('Subnet /18 (for 16k hosts)', 60, 180);
+    ctx.fillText('Subnet for 100 hosts (/25)', 60, 180);
     ctx.strokeStyle = '#28a745';
     ctx.strokeRect(50, 250, 150, 50);
-    ctx.fillText('Subnet /20 (for 4k hosts)', 60, 280);
+    ctx.fillText('Subnet for 50 hosts (/26)', 60, 280);
     ctx.strokeStyle = '#ffc107';
     ctx.strokeRect(250, 250, 100, 50);
-    ctx.fillText('Subnet /22 (for 1k hosts)', 260, 280);
-    ctx.fillStyle = '#333';
+    ctx.fillText('Subnet for 20 hosts (/27)', 255, 280);
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('VLSM tiết kiệm IP bằng cách chia subnet với kích thước khác nhau', 50, 350);
 }
 
@@ -1144,6 +1362,10 @@ function calculateVLSM() {
         return;
     }
     const [baseIp, baseCidrStr] = baseStr.split('/');
+    if(!baseIp || !baseCidrStr) {
+        resultDiv.innerHTML = '<p style="color:red;">Network gốc không hợp lệ!</p>';
+        return;
+    }
     const baseCidr = parseInt(baseCidrStr);
     const baseParts = baseIp.split('.').map(Number);
     if (baseParts.some(isNaN) || isNaN(baseCidr)) {
@@ -1157,7 +1379,7 @@ function calculateVLSM() {
         return;
     }
     let currentNum = baseNum;
-    let output = '<p>Các Subnet đã chia:</p><ul>';
+    let output = '<p>Các Subnet đã chia (sắp xếp từ lớn đến nhỏ):</p><ul>';
     let error = false;
     hosts.forEach(hostReq => {
         if(error) return;
@@ -1171,11 +1393,12 @@ function calculateVLSM() {
         const subnetSize = Math.pow(2, bitsNeeded);
         const network = numToIp(currentNum);
         const broadcast = numToIp(currentNum + subnetSize - 1);
-        output += `<li>Cho <strong>${hostReq} hosts</strong>: ${network}/${newCidr} (Broadcast: ${broadcast})</li>`;
+        output += `<li>Cho <strong>${hostReq} hosts</strong>: Cần ${hostReq+2} IPs -> Dùng /${newCidr}.<br><strong>Network: ${network}/${newCidr}</strong> (Broadcast: ${broadcast})</li>`;
         currentNum += subnetSize;
     });
     output += '</ul>';
     resultDiv.innerHTML = output;
+    saveProgress('step9');
 }
 
 // Vẽ IPv6
@@ -1183,7 +1406,8 @@ function drawIpv6() {
     const canvas = document.getElementById('ipv6Canvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // IPv4
     ctx.fillStyle = '#007bff';
@@ -1196,22 +1420,60 @@ function drawIpv6() {
     ctx.fillRect(50, 200, 450, 50);
     ctx.fillStyle = 'white';
     ctx.fillText('IPv6: 128 bit', 60, 230);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('IPv6 có không gian địa chỉ lớn hơn rất nhiều so với IPv4', 100, 270);
 }
 
-// Map IPv4 to IPv6
-function mapIpv4ToIpv6() {
-    const ip = document.getElementById('ipv4ToIpv6').value.trim();
-    const resultDiv = document.getElementById('ipv6Result');
-    const parts = ip.split('.').map(Number);
-    if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) {
-        resultDiv.innerHTML = '<p style="color:red;">IP không hợp lệ!</p>';
+// Rút gọn IPv6
+function compressIpv6() {
+    let ip = document.getElementById('ipv6ToCompress').value.trim();
+    const resultDiv = document.getElementById('ipv6CompressedResult');
+    if (!ip) {
+        resultDiv.innerHTML = '<p style="color:red;">Vui lòng nhập địa chỉ IPv6.</p>';
         return;
     }
-    const hex1 = (parts[0] * 256 + parts[1]).toString(16).padStart(4, '0');
-    const hex2 = (parts[2] * 256 + parts[3]).toString(16).padStart(4, '0');
-    resultDiv.innerHTML = `<p>IPv4-mapped IPv6 Address: <strong>::ffff:${parts.join('.')}</strong> or <strong>::ffff:${hex1}:${hex2}</strong></p>`;
+    // Step 1: remove leading zeros in each block
+    ip = ip.split(':').map(part => part.replace(/^0+/, '') || '0').join(':');
+
+    // Step 2: find the longest sequence of zeros and replace with '::'
+    let longest_sequence_start = -1;
+    let longest_sequence_length = 0;
+    let current_sequence_start = -1;
+    let current_sequence_length = 0;
+    let parts = ip.split(':');
+    for (let i = 0; i < parts.length; i++) {
+        if (parts[i] === '0') {
+            if (current_sequence_start === -1) {
+                current_sequence_start = i;
+            }
+            current_sequence_length++;
+        } else {
+            if (current_sequence_length > longest_sequence_length) {
+                longest_sequence_start = current_sequence_start;
+                longest_sequence_length = current_sequence_length;
+            }
+            current_sequence_start = -1;
+            current_sequence_length = 0;
+        }
+    }
+    if (current_sequence_length > longest_sequence_length) {
+        longest_sequence_start = current_sequence_start;
+        longest_sequence_length = current_sequence_length;
+    }
+
+    if (longest_sequence_length > 1) {
+        parts.splice(longest_sequence_start, longest_sequence_length, '');
+        if (longest_sequence_start === 0) {
+            ip = ':' + parts.join(':');
+        } else if (longest_sequence_start + longest_sequence_length === parts.length + longest_sequence_length) {
+            ip = parts.join(':') + ':';
+        } else {
+            ip = parts.join(':');
+        }
+    }
+
+    resultDiv.innerHTML = `<p>Địa chỉ rút gọn: <strong>${ip}</strong></p>`;
+    saveProgress('step10');
 }
 
 // Vẽ NAT
@@ -1219,13 +1481,14 @@ function drawNat() {
     const canvas = document.getElementById('natCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ private hosts
     for (let i = 0; i < 3; i++) {
         ctx.fillStyle = '#28a745';
         ctx.fillRect(50 + i * 100, 200, 80, 50);
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
         ctx.fillText('192.168.1.' + (10+i), 50 + i*100, 270);
     }
     // Vẽ router
@@ -1235,7 +1498,7 @@ function drawNat() {
     ctx.fill();
     ctx.fillStyle = 'white';
     ctx.fillText('NAT Router', 260, 105);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Public IP: 203.0.113.1', 250, 170);
     // Kết nối private
     for (let i = 0; i < 3; i++) {
@@ -1264,7 +1527,8 @@ function drawDhcp() {
     const canvas = document.getElementById('dhcpCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ client
     ctx.fillStyle = '#28a745';
@@ -1277,18 +1541,20 @@ function drawDhcp() {
     ctx.fillStyle = 'white';
     ctx.fillText('DHCP Server', 455, 150);
     // Arrows
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('1. DHCP Discover ➔', 170, 120);
-    ctx.fillText('2. DHCP Offer 🠐', 170, 150);
+    ctx.fillText('🠐 2. DHCP Offer', 300, 150);
     ctx.fillText('3. DHCP Request ➔', 170, 180);
-    ctx.fillText('4. DHCP ACK 🠐', 170, 210);
+    ctx.fillText('🠐 4. DHCP ACK', 300, 210);
 }
 
 // Mô phỏng DHCP
 function requestDhcpIp() {
     const mac = document.getElementById('macInput').value.trim() || '00:11:22:33:44:55';
+    const leaseTime = document.getElementById('leaseTimeSlider').value;
     const ip = '192.168.1.' + Math.floor(Math.random() * 254 + 2);
-    document.getElementById('dhcpResult').innerHTML = `<p>MAC <strong>${mac}</strong> nhận IP: <strong>${ip}</strong></p>`;
+    document.getElementById('dhcpResult').innerHTML = `<p>MAC <strong>${mac}</strong> nhận IP: <strong>${ip}</strong>. Thời gian thuê: <strong>${leaseTime} giây</strong>.</p>`;
+    saveProgress('step12');
 }
 
 // Vẽ DNS
@@ -1296,7 +1562,8 @@ function drawDns() {
     const canvas = document.getElementById('dnsCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ client
     ctx.fillStyle = '#28a745';
@@ -1309,16 +1576,26 @@ function drawDns() {
     ctx.fillStyle = 'white';
     ctx.fillText('DNS Server', 455, 150);
     // Kết nối
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Query: "example.com"? ➔', 170, 140);
     ctx.fillText('🠐 Response: "93.184.216.34"', 170, 180);
 }
 
 // Mô phỏng DNS
-function resolveDns() {
+function resolveDnsRecord() {
     const domain = document.getElementById('domainInput').value.trim() || 'example.com';
-    const ip = Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 254 + 1);
-    document.getElementById('dnsResult').innerHTML = `<p><strong>${domain}</strong> -> <strong>${ip}</strong></p>`;
+    const type = document.getElementById('dnsRecordType').value;
+    const resultDiv = document.getElementById('dnsRecordResult');
+    let result = '';
+    switch(type) {
+        case 'A': result = Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 256) + '.' + Math.floor(Math.random() * 254 + 1); break;
+        case 'AAAA': result = '2001:db8::' + Math.floor(Math.random() * 65535).toString(16); break;
+        case 'MX': result = '10 mail.example.com'; break;
+        case 'CNAME': result = 'real.server.com'; break;
+        case 'TXT': result = '"v=spf1 include:_spf.google.com ~all"'; break;
+    }
+    resultDiv.innerHTML = `<p><strong>[${type}] ${domain}</strong> -> <strong>${result}</strong></p>`;
+    saveProgress('step13');
 }
 
 // Vẽ Routing
@@ -1326,12 +1603,13 @@ function drawRouting() {
     const canvas = document.getElementById('routingCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     // Vẽ mạng 1
     ctx.strokeStyle = '#28a745';
     ctx.strokeRect(50, 100, 200, 200);
-    ctx.fillStyle = '#333';
     ctx.fillText('Mạng 1: 192.168.1.0/24', 60, 80);
     // Vẽ router
     ctx.fillStyle = '#007bff';
@@ -1343,7 +1621,7 @@ function drawRouting() {
     // Vẽ mạng 2
     ctx.strokeStyle = '#dc3545';
     ctx.strokeRect(450, 100, 200, 200);
-    ctx.fillStyle = '#333';
+     ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Mạng 2: 192.168.2.0/24', 460, 80);
     // Kết nối
     ctx.strokeStyle = '#6c757d';
@@ -1380,6 +1658,7 @@ function checkRouting() {
     const maskNum = (maskParts[0] << 24) | (maskParts[1] << 16) | (maskParts[2] << 8) | maskParts[3];
     const sameNetwork = (sourceNum & maskNum) === (destNum & maskNum);
     resultDiv.innerHTML = `<p style="font-weight:bold;">${sameNetwork ? 'Cùng mạng, không cần router.' : 'Khác mạng, cần router.'}</p>`;
+    saveProgress('step14');
 }
 
 // Vẽ Firewall
@@ -1387,7 +1666,8 @@ function drawFirewall(packetX, status) {
     const canvas = document.getElementById('firewallCanvas');
      if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ mạng nội bộ
     ctx.fillStyle = '#28a745';
@@ -1443,21 +1723,52 @@ function animateFirewall() {
     animate();
 }
 
-// Kiểm tra firewall
-function checkFirewall() {
-    const ip = document.getElementById('fwIp').value.trim();
-    const port = parseInt(document.getElementById('fwPort').value);
-    let blocked = false;
-    // Simple rule: block 10.x.x.x on port 80
-    if (ip.startsWith('10.') && port === 80) blocked = true;
-    document.getElementById('fwResult').innerHTML = `<p style="font-weight:bold; color:${blocked ? 'red' : 'green'}">${blocked ? 'Chặn!' : 'Cho phép!'}</p>`;
+// Kiểm tra firewall JSON
+function checkFirewallRules() {
+    const resultDiv = document.getElementById('firewallJsonResult');
+    try {
+        const rules = JSON.parse(document.getElementById('firewallRules').value);
+        const ipStr = document.getElementById('firewallCheckIp').value;
+        const port = parseInt(document.getElementById('firewallCheckPort').value);
+        
+        for (const rule of rules) {
+            let match = false;
+            if (rule.source_ip) {
+                // simple check for now, not full CIDR
+                if (ipStr === rule.source_ip || (rule.source_ip.includes('/') && ipStr.startsWith(rule.source_ip.split('/')[0].slice(0, -1)))) {
+                     match = true;
+                } else {
+                    continue; // if source_ip is specified and doesn't match, skip rule
+                }
+            }
+            if (rule.port) {
+                if(port === rule.port) match = true; else continue;
+            }
+            if(rule.protocol && rule.protocol !== 'any'){
+                // for simplicity, we assume all traffic matches the protocol
+                match = true;
+            } else {
+                 match = true;
+            }
+            
+            if (match || rule.action === 'deny' && rule.protocol === 'any') { // default deny
+                const color = rule.action === 'allow' ? 'green' : 'red';
+                resultDiv.innerHTML = `<p style="color:${color}; font-weight:bold;">Hành động: ${rule.action.toUpperCase()}. Lý do: ${rule.description}</p>`;
+                saveProgress('step15');
+                return;
+            }
+        }
+    } catch(e) {
+        resultDiv.innerHTML = '<p style="color:red;">Lỗi JSON không hợp lệ!</p>';
+    }
 }
 // Vẽ VPN
 function drawVpn() {
     const canvas = document.getElementById('vpnCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ user
     ctx.fillStyle = '#28a745';
@@ -1472,21 +1783,21 @@ function drawVpn() {
     // Đường hầm
     ctx.fillStyle = 'rgba(220, 53, 69, 0.5)';
     ctx.fillRect(150, 130, 300, 40);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Đường Hầm An Toàn (Encrypted Tunnel)', 180, 180);
 }
 let vpnAnimationId;
 // Animation VPN
 function animateVpn() {
     cancelAnimationFrame(vpnAnimationId);
-    const canvas = document.getElementById('vpnCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
     let x = 160;
 
     function animate() {
         drawVpn(); // Redraws static background
         
+        const canvas = document.getElementById('vpnCanvas');
+        if (!canvas?.getContext) return;
+        const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffcc00';
         ctx.beginPath();
         ctx.arc(x, 150, 15, 0, 2 * Math.PI);
@@ -1509,7 +1820,9 @@ function animateVpn() {
 function connectVpn() {
     const server = document.getElementById('vpnServer').value.trim() || 'vpn.example.com';
     const ip = document.getElementById('userIp').value.trim() || '192.168.1.10';
-    document.getElementById('vpnResult').innerHTML = `<p>Kết nối đến <strong>${server}</strong> từ <strong>${ip}</strong> thành công!</p>`;
+    const vpnType = document.querySelector('input[name="vpnType"]:checked').value;
+    document.getElementById('vpnResult').innerHTML = `<p>Kết nối đến <strong>${server}</strong> từ <strong>${ip}</strong> qua <strong>${vpnType} VPN</strong> thành công!</p>`;
+    saveProgress('step16');
 }
 
 // Vẽ Wi-Fi
@@ -1517,7 +1830,8 @@ function drawWifi(radius) {
     const canvas = document.getElementById('wifiCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ router
     ctx.fillStyle = '#007bff';
@@ -1537,8 +1851,11 @@ function drawWifi(radius) {
     // Thiết bị
     ctx.fillStyle = '#28a745';
     ctx.fillRect(50, 150, 50, 50);
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Device', 50, 220);
+    ctx.fillStyle = '#28a745';
     ctx.fillRect(500, 150, 50, 50);
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Device', 500, 220);
     
     if (radius) {
@@ -1553,9 +1870,6 @@ let wifiAnimationId;
 // Animation Wi-Fi
 function animateWifi() {
     cancelAnimationFrame(wifiAnimationId);
-    const canvas = document.getElementById('wifiCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
     let radius = 40;
 
     function animate() {
@@ -1564,7 +1878,10 @@ function animateWifi() {
         if (radius < 250) {
             wifiAnimationId = requestAnimationFrame(animate);
         } else {
-             // The animation is over, just draw the text on top
+             drawWifi();
+             const canvas = document.getElementById('wifiCanvas');
+             if (!canvas?.getContext) return;
+             const ctx = canvas.getContext('2d');
              ctx.fillStyle = '#00ff00';
              ctx.font = '20px Arial';
              ctx.fillText('Kết Nối!', 250, 300);
@@ -1573,14 +1890,34 @@ function animateWifi() {
     animate();
 }
 
+// Kiểm tra độ mạnh mật khẩu
+function checkPasswordStrength(password) {
+    const strengthDiv = document.getElementById('passwordStrength');
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    
+    let width = (score / 5) * 100;
+    let color = '#dc3545'; // Yếu
+    if (score >= 3) color = '#ffc107'; // Trung bình
+    if (score >= 4) color = '#28a745'; // Mạnh
+    
+    strengthDiv.style.width = width + '%';
+    strengthDiv.style.backgroundColor = color;
+}
+
 // Mô phỏng kết nối Wi-Fi
 function connectWifi() {
     const ssid = document.getElementById('ssidInput').value.trim() || 'MyWiFi';
     const pass = document.getElementById('wifiPass').value.trim();
-    if(pass === '123456'){
-        document.getElementById('wifiResult').innerHTML = `<p>Kết nối đến SSID <strong>${ssid}</strong> thành công!</p>`;
+    if(pass){
+        document.getElementById('wifiResult').innerHTML = `<p>Đang thử kết nối đến SSID <strong>${ssid}</strong>...</p>`;
+        saveProgress('step17');
     } else {
-         document.getElementById('wifiResult').innerHTML = `<p style="color:red">Sai mật khẩu cho SSID <strong>${ssid}</strong>!</p>`;
+         document.getElementById('wifiResult').innerHTML = `<p style="color:red">Vui lòng nhập mật khẩu cho SSID <strong>${ssid}</strong>!</p>`;
     }
 }
 
@@ -1589,12 +1926,13 @@ function drawPort() {
     const canvas = document.getElementById('portCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // Vẽ tòa nhà
     ctx.fillStyle = '#6c757d';
     ctx.fillRect(200, 100, 200, 150);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('IP: 203.0.113.10 (Server)', 220, 90);
     // Vẽ port
     const ports = [{num: 80, name: 'Web'}, {num: 443, name: 'Secure'}, {num: 25, name: 'Email'}];
@@ -1608,14 +1946,13 @@ function drawPort() {
 let portAnimationId;
 function animatePort() {
     cancelAnimationFrame(portAnimationId);
-    const canvas = document.getElementById('portCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
     let y = 50;
 
     function animate() {
         drawPort(); // Redraws static background
-        
+        const canvas = document.getElementById('portCanvas');
+        if (!canvas?.getContext) return;
+        const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ff0000';
         ctx.beginPath();
         ctx.arc(240, y, 10, 0, 2 * Math.PI);
@@ -1637,21 +1974,34 @@ function animatePort() {
 // Kiểm tra port
 function checkPort() {
     const port = parseInt(document.getElementById('portInput').value);
-    let service = 'Unknown/Dynamic';
+    const resultDiv = document.getElementById('portResult');
+    let service = 'Unknown';
+    let range = '';
+
+    if(port >= 0 && port <= 1023) range = 'Well-known Port';
+    else if(port >= 1024 && port <= 49151) range = 'Registered Port';
+    else if(port >= 49152 && port <= 65535) range = 'Dynamic/Private Port';
+    else {
+        resultDiv.innerHTML = `<p style="color:red">Port không hợp lệ</p>`;
+        return;
+    }
+
     if (port === 80) service = 'HTTP (Web)';
     else if (port === 443) service = 'HTTPS (Secure Web)';
     else if (port === 21) service = 'FTP (File Transfer)';
     else if (port === 22) service = 'SSH (Secure Shell)';
     else if (port === 25) service = 'SMTP (Email)';
     else if (port === 53) service = 'DNS (Domain Name System)';
-    document.getElementById('portResult').innerHTML = `<p>Port <strong>${port}</strong>: ${service}</p>`;
+    resultDiv.innerHTML = `<p>Port <strong>${port}</strong> thuộc dải <strong>${range}</strong>. Dịch vụ phổ biến: ${service}</p>`;
+    saveProgress('step19');
 }
 // Vẽ TCP UDP
 function drawTcpUdp() {
     const canvas = document.getElementById('tcpUdpCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     // TCP
     ctx.fillStyle = '#007bff';
@@ -1667,21 +2017,21 @@ function drawTcpUdp() {
     ctx.fillText('UDP: Nhanh, không tin cậy', 360, 150);
     ctx.fillText('Gói 1 ->', 380, 180);
     ctx.fillText('Gói 2 ->', 380, 195);
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('TCP cho web, email. UDP cho video, game.', 150, 300);
 }
 
 let tcpUdpAnimationId;
 function animateTcpUdp() {
     cancelAnimationFrame(tcpUdpAnimationId);
-    const canvas = document.getElementById('tcpUdpCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
     let tcpX = 50, udpX = 350;
     const tcpDest = 250, udpDest = 550;
 
     function animate() {
         drawTcpUdp();
+        const canvas = document.getElementById('tcpUdpCanvas');
+        if (!canvas?.getContext) return;
+        const ctx = canvas.getContext('2d');
         
         // TCP packet
         if (tcpX < tcpDest) {
@@ -1722,43 +2072,53 @@ function animateTcpUdp() {
 function suggestProtocol() {
     const app = document.getElementById('appInput').value.trim().toLowerCase();
     let protocol = 'TCP';
-    let reason = 'cần độ tin cậy cao.';
-    if (app.includes('video') || app.includes('game') || app.includes('stream')) {
+    let reason = 'cần độ tin cậy cao (web, email, file transfer).';
+    if (app.includes('video') || app.includes('game') || app.includes('stream') || app.includes('voice')) {
         protocol = 'UDP';
         reason = 'ưu tiên tốc độ hơn độ tin cậy.';
     }
+    if (app.includes('video') || app.includes('voice')) {
+         protocol = 'UDP hoặc QUIC';
+         reason = 'ưu tiên độ trễ thấp. QUIC là một lựa chọn hiện đại.';
+    }
     document.getElementById('protocolResult').innerHTML = `<p>Ứng dụng <strong>${app}</strong> nên dùng <strong>${protocol}</strong> vì nó ${reason}</p>`;
+    saveProgress('step20');
 }
 
 // Vẽ OSI
-function drawOsi() {
+function drawOsi(highlightLayer = -1) {
     const canvas = document.getElementById('osiCanvas');
     if (!canvas?.getContext) return;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f8f9fa';
+    const theme = document.documentElement.getAttribute('data-theme');
+    ctx.fillStyle = theme === 'dark' ? '#343a40' : '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const layers = ['7. Application', '6. Presentation', '5. Session', '4. Transport', '3. Network', '2. Data Link', '1. Physical'];
     for (let i = 0; i < 7; i++) {
-        ctx.fillStyle = `hsl(${i*50}, 70%, 50%)`;
+        if (i === (7-highlightLayer)) {
+            ctx.fillStyle = '#ffc107'; // highlight color
+        } else {
+            ctx.fillStyle = `hsl(${i*50}, 70%, 50%)`;
+        }
         ctx.fillRect(100, 50 + i * 60, 400, 50);
         ctx.fillStyle = 'white';
         ctx.font = '18px Arial';
         ctx.fillText(layers[i], 120, 80 + i * 60);
     }
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = theme === 'dark' ? '#f8f9fa' : '#333';
     ctx.fillText('Mô Hình OSI 7 Tầng', 230, 30);
 }
 let osiAnimationId;
 // Animation OSI
 function animateOsi() {
     cancelAnimationFrame(osiAnimationId);
-    const canvas = document.getElementById('osiCanvas');
-    if (!canvas?.getContext) return;
-    const ctx = canvas.getContext('2d');
     let y = 50;
     
     function animate() {
         drawOsi();
+        const canvas = document.getElementById('osiCanvas');
+        if (!canvas?.getContext) return;
+        const ctx = canvas.getContext('2d');
         ctx.strokeStyle = '#ffcc00';
         ctx.lineWidth = 5;
         ctx.strokeRect(95, y, 410, 50);
@@ -1771,21 +2131,17 @@ function animateOsi() {
     animate();
 }
 
-// Mô tả tầng OSI
-function describeOsiLayer() {
-    const layer = document.getElementById('osiLayer').value;
-    let desc = '';
-    switch (layer) {
-        case '1': desc = '<strong>Physical (Vật lý):</strong> Truyền tín hiệu vật lý (cáp, sóng radio). Ví dụ: Ethernet cable, Wi-Fi signal.'; break;
-        case '2': desc = '<strong>Data Link (Liên kết dữ liệu):</strong> Truyền frame giữa các thiết bị cùng mạng. Ví dụ: MAC Address, Switches.'; break;
-        case '3': desc = '<strong>Network (Mạng):</strong> Định tuyến packet giữa các mạng khác nhau. Ví dụ: IP Address, Routers.'; break;
-        case '4': desc = '<strong>Transport (Giao vận):</strong> Đảm bảo truyền dữ liệu đầu cuối. Ví dụ: TCP (tin cậy), UDP (nhanh).'; break;
-        case '5': desc = '<strong>Session (Phiên):</strong> Quản lý, duy trì, kết thúc phiên kết nối. Ví dụ: Login sessions.'; break;
-        case '6': desc = '<strong>Presentation (Trình bày):</strong> Định dạng, mã hóa, nén dữ liệu. Ví dụ: JPEG, SSL/TLS encryption.'; break;
-        case '7': desc = '<strong>Application (Ứng dụng):</strong> Giao thức cấp cao cho ứng dụng người dùng. Ví dụ: HTTP, FTP, SMTP.'; break;
-        default: desc = 'Vui lòng chọn một tầng.';
+// Highlight OSI Layer
+function highlightOsiLayer() {
+    const layer = document.getElementById('osiProtocolSelect').value;
+    const protocolName = document.getElementById('osiProtocolSelect').options[document.getElementById('osiProtocolSelect').selectedIndex].text;
+    if(!layer) {
+        drawOsi(-1);
+        return;
     }
-    document.getElementById('osiResult').innerHTML = `<p><strong>Tầng ${layer}:</strong> ${desc}</p>`;
+    drawOsi(parseInt(layer));
+    document.getElementById('osiResult').innerHTML = `<p>Giao thức <strong>${protocolName}</strong> hoạt động ở <strong>Tầng ${layer}</strong>.</p>`;
+    saveProgress('step21');
 }
 
 
@@ -1793,7 +2149,9 @@ function describeOsiLayer() {
 window.onload = () => {
     // Apply saved theme
     const savedTheme = localStorage.getItem('theme') || 'light';
-    applyTheme(savedTheme);
+    // Don't call applyTheme here to avoid recursion on theme toggle, set attribute directly
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
     // Load saved progress
     updateProgressUI();
@@ -1817,6 +2175,7 @@ window.onload = () => {
     drawPort();
     drawTcpUdp();
     drawOsi();
+    renderScoreChart('totalQuizHistory');
 
     // Initial scroll update
     updateScrollProgress();
