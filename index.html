@@ -55,9 +55,14 @@
             padding-left: calc(var(--sidebar-width) + 40px);
         }
 
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             color: var(--primary-color);
         }
+        h4 {
+             color: var(--info-color);
+             margin-top: 25px;
+        }
+
 
         h3 {
              border-bottom: 2px solid var(--border-color);
@@ -316,7 +321,7 @@
         <h2>Bài Học</h2>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
         <ul>
-            <li><a href="#intro" id="nav-intro">Giới thiệu chung</a></li>
+            <li><a href="#intro" id="nav-intro">Giới thiệu chung & ARP</a></li>
             <li><a href="#step1" id="nav-step1">Bước 1: IP Address là gì?</a></li>
             <li><a href="#step2" id="nav-step2">Bước 2: Subnet Mask là gì?</a></li>
             <li><a href="#step3" id="nav-step3">Bước 3: Tính toán Subnet</a></li>
@@ -330,7 +335,7 @@
             <li><a href="#step11" id="nav-step11">Bước 11: NAT</a></li>
             <li><a href="#step12" id="nav-step12">Bước 12: DHCP</a></li>
             <li><a href="#step13" id="nav-step13">Bước 13: DNS</a></li>
-            <li><a href="#step14" id="nav-step14">Bước 14: Routing</a></li>
+            <li><a href="#step14" id="nav-step14">Bước 14: Routing & Gateway</a></li>
             <li><a href="#step15" id="nav-step15">Bước 15: Firewall</a></li>
             <li><a href="#step16" id="nav-step16">Bước 16: VPN</a></li>
             <li><a href="#step17" id="nav-step17">Bước 17: Wi-Fi</a></li>
@@ -339,6 +344,7 @@
             <li><a href="#step20" id="nav-step20">Bước 20: TCP vs UDP</a></li>
             <li><a href="#step21" id="nav-step21">Bước 21: Mô hình OSI</a></li>
             <li><a href="#step22" id="nav-step22">Bước 22: Quiz tổng hợp</a></li>
+            <li><a href="#step23" id="nav-step23">Bước 23: Tổng kết: Vòng đời gói tin</a></li>
             <li><a href="#further-reading" id="nav-further-reading">Đọc thêm</a></li>
         </ul>
     </nav>
@@ -347,24 +353,56 @@
         <div class="section" id="preface">
             <h2>Lời nói đầu: Tại sao phải hiểu về Mạng Máy Tính?</h2>
             <p>Trong thế giới số hiện nay, từ việc lướt web, gửi email, chơi game online đến vận hành các trung tâm dữ liệu khổng lồ của Google, Amazon, tất cả đều dựa trên nền tảng mạng máy tính. Hiểu về địa chỉ IP, Subnet Mask và các khái niệm liên quan không chỉ là kiến thức dành cho chuyên gia IT mà còn là kỹ năng cần thiết cho bất kỳ ai muốn tìm hiểu sâu hơn về công nghệ.</p>
-            <p>Khóa học này sẽ dẫn dắt bạn qua <strong>22 bước</strong>, từ những khái niệm cơ bản nhất như IP là gì cho đến các chủ đề nâng cao như VLSM, IPv6, routing, và bảo mật mạng. Hãy cùng bắt đầu hành trình khám phá xương sống của Internet!</p>
+            <p>Khóa học này sẽ dẫn dắt bạn qua <strong>23 bước</strong>, từ những khái niệm cơ bản nhất như IP là gì cho đến các chủ đề nâng cao như VLSM, IPv6, routing, và bảo mật mạng. Hãy cùng bắt đầu hành trình khám phá xương sống của Internet!</p>
         </div>
         
         <h1>Mô Hình Hóa IP và Subnet Mask</h1>
         
         <div class="section" id="intro">
-            <h2>Giới Thiệu Chung: IP, MAC, và DNS - Bộ Ba Quyền Lực</h2>
-            <p>Trước khi đi sâu, hãy phân biệt rõ ba khái niệm cốt lõi:</p>
+            <h2>Giới Thiệu Chung: Cơ Chế Giao Tiếp Trong Mạng Nội Bộ (IP, MAC, và ARP)</h2>
+            <p>Khi một thiết bị tham gia vào mạng, nó được nhận dạng qua hai loại địa chỉ:</p>
             <ul>
-                <li><strong>Địa chỉ IP (Logical Address):</strong> Như địa chỉ nhà của bạn, có thể thay đổi nếu bạn chuyển nhà. Nó dùng để định tuyến gói tin trên Internet.</li>
-                <li><strong>Địa chỉ MAC (Physical Address):</strong> Như số Căn cước công dân của thiết bị, là duy nhất và không đổi. Nó dùng để gửi dữ liệu trong mạng nội bộ (LAN).</li>
-                <li><strong>DNS (Domain Name System):</strong> Như danh bạ điện thoại, dịch tên miền (ví dụ: google.com) thành địa chỉ IP để máy tính có thể hiểu và kết nối.</li>
+                <li><strong>IP Address (Internet Protocol Address) – <em>Địa chỉ lớp 3:</em></strong> Là định danh logic, có thể thay đổi theo từng mạng hoặc khi thiết bị di chuyển. Dùng để xác định vị trí của thiết bị trong mạng.</li>
+                <li><strong>MAC Address (Media Access Control Address) – <em>Địa chỉ lớp 2:</em></strong> Là địa chỉ vật lý gắn với card mạng (NIC), được nhà sản xuất gán cố định và là duy nhất trên toàn cầu.</li>
             </ul>
-            <p><strong>Ví dụ thực tế:</strong> Khi bạn gõ `google.com` vào trình duyệt, máy tính của bạn hỏi DNS server để lấy IP của Google. Sau đó, nó tạo gói tin với IP đích đó và gửi đến router. Quá trình này được điều phối bởi Giao thức phân giải địa chỉ (ARP). <strong>Khi một máy tính muốn gửi dữ liệu đến một IP trong cùng mạng LAN, nó sẽ gửi một gói tin ARP hỏi 'Ai có IP này? Hãy cho tôi biết địa chỉ MAC của bạn'. Máy tính có IP đó sẽ trả lời bằng địa chỉ MAC của mình.</strong> Tìm hiểu thêm tại <a href="https://tools.ietf.org/html/rfc826" target="_blank" rel="noopener noreferrer">RFC826 (ARP)</a>.</p>
+            <blockquote>🔎 Trong mạng nội bộ (cùng subnet), thiết bị không chỉ cần biết IP của thiết bị khác mà còn phải biết MAC để có thể truyền dữ liệu chính xác đến đúng đối tượng.</blockquote>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Mối quan hệ IP và MAC trong mạng nội bộ]</em></p>
+            </div>
+
+            <h3>ARP (Address Resolution Protocol): Cầu nối giữa IP và MAC</h3>
+            <p>Khi một thiết bị muốn gửi dữ liệu tới một IP trong cùng mạng lần đầu tiên, nó cần xác định MAC tương ứng. Lúc này, giao thức <strong>ARP</strong> sẽ thực hiện chức năng sau:</p>
+            <ul>
+                <li><strong>Gửi truy vấn ARP (ARP Request):</strong> Thiết bị phát một gói tin dạng quảng bá (broadcast) đến toàn mạng, hỏi: <em>“Thiết bị nào đang sử dụng IP 192.168.1.25?”</em></li>
+                <li><strong>Nhận phản hồi ARP (ARP Reply):</strong> Thiết bị sở hữu IP đó sẽ trả lời: <em>“Tôi đang sử dụng địa chỉ đó, đây là MAC của tôi: AA:BB:CC:DD:EE:FF”</em></li>
+                <li><strong>Lưu vào ARP Cache:</strong> Máy gửi sẽ lưu thông tin ánh xạ IP–MAC vào bảng ARP để sử dụng cho các lần truyền dữ liệu tiếp theo, giúp giảm tải cho mạng và tăng tốc độ giao tiếp.</li>
+            </ul>
+            <p><strong>Tóm lại:</strong></p>
+            <ul>
+                <li><strong>IP</strong> giúp thiết bị biết phải gửi đến đâu.</li>
+                <li><strong>MAC</strong> giúp thiết bị gửi đúng tới ai.</li>
+                <li><strong>ARP</strong> giúp thiết bị biết "địa chỉ vật lý" (MAC) khi chỉ có "địa chỉ logic" (IP).</li>
+            </ul>
+
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Quá trình hoạt động của ARP Request và Reply]</em></p>
+            </div>
+            <p>Tìm hiểu thêm tại <a href="https://tools.ietf.org/html/rfc826" target="_blank" rel="noopener noreferrer">RFC826 (ARP)</a>.</p>
         </div>
 
         <div class="section" id="step1">
             <h2>Bước 1: IP Address Là Gì? (Giống Như Địa Chỉ Nhà)</h2>
+            <div class="case-study">
+                <h3>Sơ đồ luồng hoạt động của IP và Subnet Mask</h3>
+                <ul>
+                    <li><strong>Địa chỉ IP (Internet Protocol Address):</strong> Là "số nhà" của mỗi thiết bị trong mạng, giúp các thiết bị định vị và liên lạc với nhau. Ví dụ, trong sơ đồ, <strong>192.168.1.10</strong> là địa chỉ IP của <strong>Máy tính 1</strong>.</li>
+                    <li><strong>Subnet Mask (Mặt nạ mạng con):</strong> Không phải địa chỉ, mà là quy tắc cho biết phần nào trong IP là <strong>mạng (Network ID)</strong> và phần nào là <strong>thiết bị (Host ID)</strong>. Nó giúp thiết bị hiểu cách phân chia và định tuyến trong mạng.</li>
+                </ul>
+                <div style="text-align:center; padding: 20px;">
+                    <p><em>[Sơ đồ minh họa: Luồng hoạt động IP và Subnet Mask]</em></p>
+                </div>
+            </div>
+            
             <p>Hãy tưởng tượng internet như một thành phố khổng lồ. Mỗi máy tính, điện thoại là một ngôi nhà. Để gửi thư (dữ liệu), cần địa chỉ nhà chính xác. Đó là IP!</p>
             <p>IP IPv4 giống như: <strong>Số nhà. Đường. Phường. Quận</strong> - Nhưng dùng số: xxx.xxx.xxx.xxx (mỗi xxx từ 0-255). Ví dụ: 192.168.1.1.</p>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP 192.168.1.1 giống như "Số 1, Ngõ 1, Phố 168, Quận 192". Phần đầu là khu vực lớn, phần sau là nhà cụ thể.</div>
@@ -551,8 +589,39 @@
             </div>
         </div>
         <div class="section" id="step11">
-            <h2>Bước 11: NAT - Network Address Translation</h2>
-            <p>NAT cho phép nhiều thiết bị dùng IP private chia sẻ một IP public để ra internet.</p>
+            <h2>Bước 11: NAT (Network Address Translation) và NAT Table</h2>
+            <p><strong>NAT</strong> là quá trình giúp thiết bị trong mạng nội bộ sử dụng địa chỉ <strong>Private IP</strong> (ví dụ: `192.168.1.10`) có thể <strong>giao tiếp với Internet thông qua một địa chỉ Public IP duy nhất</strong> (ví dụ: `123.45.67.89`), bằng cách chuyển đổi địa chỉ IP nguồn trong gói tin.</p>
+            <h3>Cơ chế hoạt động</h3>
+            <ol>
+                <li><strong>Thiết bị gửi yêu cầu:</strong> Gói tin có IP nguồn là `192.168.1.10`, IP đích là địa chỉ máy chủ ngoài Internet (ví dụ: `8.8.8.8`).</li>
+                <li><strong>Router thực hiện NAT:</strong> Thay địa chỉ IP nguồn `192.168.1.10` bằng địa chỉ công cộng `123.45.67.89`.</li>
+                <li><strong>Router lưu thông tin ánh xạ</strong> vào một bảng gọi là <strong>NAT Table</strong>, ví dụ: `192.168.1.10:54321 → 123.45.67.89:61001`</li>
+                <li><strong>Server ngoài Internet trả lời</strong> về địa chỉ `123.45.67.89:61001`.</li>
+                <li><strong>Router tra cứu NAT Table,</strong> tìm thấy ánh xạ ban đầu và chuyển gói tin trở lại cho thiết bị `192.168.1.10:54321`.</li>
+            </ol>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Cơ chế hoạt động của NAT]</em></p>
+            </div>
+
+            <h3>NAT Table</h3>
+            <p>NAT Table là bảng ghi tạm thời được Router sử dụng để theo dõi và ánh xạ các kết nối giữa thiết bị trong mạng nội bộ (Private IP) và thế giới bên ngoài (Public IP). Khi nhiều thiết bị trong mạng nội bộ cùng truy cập Internet, Router thực hiện:</p>
+            <ol>
+                <li>Chuyển đổi địa chỉ IP nguồn của từng thiết bị thành địa chỉ Public chung của Router.</li>
+                <li>Gán mỗi kết nối một cổng (Port) khác nhau, giúp phân biệt các luồng dữ liệu riêng biệt.</li>
+                <li>Lưu thông tin ánh xạ vào NAT Table.</li>
+            </ol>
+            <table>
+                <thead><tr><th>IP nội bộ</th><th>Port nội bộ</th><th>IP công cộng</th><th>Port công cộng</th></tr></thead>
+                <tbody>
+                    <tr><td>192.168.1.10</td><td>54321</td><td>123.45.67.89</td><td>61001</td></tr>
+                    <tr><td>192.168.1.20</td><td>54322</td><td>123.45.67.89</td><td>61002</td></tr>
+                </tbody>
+            </table>
+            <blockquote>Như vậy, mặc dù cả hai thiết bị cùng sử dụng một địa chỉ công cộng (123.45.67.89), chúng vẫn được phân biệt rõ ràng thông qua cặp địa chỉ IP–Port.</blockquote>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: NAT Table với nhiều thiết bị]</em></p>
+            </div>
+
             <h3>Các loại NAT</h3>
             <ul>
                 <li><strong>SNAT (Source NAT):</strong> Thay đổi địa chỉ IP nguồn của gói tin đi ra ngoài. Đây là loại NAT phổ biến nhất cho mạng gia đình/văn phòng.</li>
@@ -565,8 +634,22 @@
         </div>
         <div class="section" id="step12">
             <h2>Bước 12: DHCP - Dynamic Host Configuration Protocol (Gán IP Tự Động)</h2>
-            <p>DHCP tự động gán IP, subnet mask, gateway cho thiết bị khi kết nối mạng. Quá trình này gọi là <strong>DORA</strong>: Discover, Offer, Request, Acknowledge.</p>
-            <p>IP được cấp trong một khoảng thời gian gọi là <strong>Lease Time</strong>. Hết nửa thời gian, client sẽ cố gắng gia hạn (renew). Nếu thất bại, nó sẽ thử lại khi còn 87.5% thời gian (rebinding).</p>
+            <p>DHCP là giao thức chịu trách nhiệm <strong>tự động cấp phát thông tin cấu hình mạng</strong> cho thiết bị: IP, Subnet Mask, Default Gateway, DNS... Quá trình này gọi là <strong>DORA</strong> (4 bước):</p>
+            <ol>
+                <li><strong>Discover:</strong> Thiết bị gửi yêu cầu tìm DHCP Server.</li>
+                <li><strong>Offer:</strong> DHCP Server phản hồi, đề xuất một địa chỉ IP khả dụng.</li>
+                <li><strong>Request:</strong> Thiết bị gửi yêu cầu chính thức xin sử dụng địa chỉ đó.</li>
+                <li><strong>Acknowledge:</strong> DHCP Server xác nhận và cung cấp đầy đủ thông tin cấu hình mạng.</li>
+            </ol>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Quá trình DORA của DHCP]</em></p>
+            </div>
+            <h3>Lợi ích của DHCP:</h3>
+            <ul>
+                <li><strong>Tránh xung đột IP:</strong> Đảm bảo mỗi thiết bị được cấp một địa chỉ IP duy nhất.</li>
+                <li><strong>Tự động cấu hình:</strong> Người dùng không cần nhập tay các thông số mạng.</li>
+                <li><strong>Quản lý tập trung:</strong> Quản trị viên có thể cấu hình toàn bộ hệ thống mạng từ một điểm duy nhất.</li>
+            </ul>
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như quầy lễ tân khách sạn tự động gán phòng khi bạn check-in, thay vì chọn phòng thủ công.</div>
             <h3>Sơ Đồ Minh Họa: Quá Trình DHCP</h3>
             <canvas id="dhcpCanvas" width="600" height="300"></canvas>
@@ -582,8 +665,24 @@
         </div>
         <div class="section" id="step13">
             <h2>Bước 13: DNS - Domain Name System (Chuyển Tên Miền Sang IP)</h2>
-            <p>DNS như sổ danh bạ, chuyển tên miền (ví dụ google.com) thành IP để máy tính kết nối. Có nhiều loại bản ghi (record) DNS:</p>
-            <ul>
+            <p>DNS là hệ thống giúp <strong>chuyển đổi tên miền (như `google.com`) thành địa chỉ IP</strong> mà máy tính có thể xử lý. DNS hoạt động như một cuốn danh bạ toàn cầu.</p>
+            <h3>Quy trình phân giải tên miền:</h3>
+            <ol>
+                <li>Khi người dùng nhập một tên miền, máy tính sẽ gửi truy vấn đến <strong>DNS Resolver</strong> gần nhất (được cấp qua DHCP).</li>
+                <li>Nếu Resolver không biết, nó sẽ truy vấn theo chuỗi cấp bậc:
+                    <ul>
+                        <li><strong>Root Server:</strong> Trả lời ai quản lý tên miền cấp cao `.com`.</li>
+                        <li><strong>TLD Server:</strong> Chỉ ra máy chủ quản lý `google.com`.</li>
+                        <li><strong>Authoritative Server:</strong> Trả về địa chỉ IP chính xác của `google.com`.</li>
+                    </ul>
+                </li>
+                <li>DNS Resolver lưu kết quả vào bộ nhớ tạm (cache) để tăng tốc cho các lần truy cập sau.</li>
+            </ol>
+             <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Quy trình phân giải DNS từ Client đến Authoritative Server]</em></p>
+            </div>
+            <h3>Các loại bản ghi (record) DNS:</h3>
+             <ul>
                 <li><strong>A Record:</strong> Map tên miền sang địa chỉ IPv4.</li>
                 <li><strong>AAAA Record:</strong> Map tên miền sang địa chỉ IPv6.</li>
                 <li><strong>CNAME Record (Canonical Name):</strong> Tạo bí danh cho một tên miền khác.</li>
@@ -609,10 +708,18 @@
             </div>
         </div>
         <div class="section" id="step14">
-            <h2>Bước 14: Routing Cơ Bản (Định Tuyến Dữ Liệu)</h2>
+            <h2>Bước 14: Routing và Default Gateway (Định Tuyến Dữ Liệu)</h2>
             <p>Routing là cách dữ liệu đi từ mạng này sang mạng khác, qua router dựa trên bảng định tuyến.</p>
-             <h3>Default Gateway là gì?</h3>
-            <p>Default Gateway (cổng mặc định) là một khái niệm cực kỳ quan trọng. Nó chính là địa chỉ IP của Router trong mạng LAN, là cửa ngõ để các thiết bị trong mạng có thể kết nối ra các mạng khác, bao gồm cả Internet. Khi DHCP cấp phát IP, nó cũng sẽ cung cấp địa chỉ Default Gateway này cho các thiết bị.</p>
+             <h3>Default Gateway (Cổng mặc định) là gì?</h3>
+            <p>Default Gateway là thiết bị trung gian (thường là Router) có nhiệm vụ chuyển tiếp dữ liệu từ mạng nội bộ ra bên ngoài (Internet hoặc các mạng khác). Có thể hình dung nó như “cổng làng” hoặc “người gác cổng” của hệ thống mạng.</p>
+            <ul>
+                <li><strong>Giao tiếp trong mạng nội bộ:</strong> Nếu thiết bị của bạn (ví dụ: 192.168.1.10) muốn liên lạc với một thiết bị khác trong cùng mạng (như 192.168.1.25), dữ liệu sẽ được gửi trực tiếp mà không cần đi qua Gateway.</li>
+                <li><strong>Giao tiếp với bên ngoài:</strong> Khi thiết bị cần truy cập một địa chỉ IP bên ngoài mạng nội bộ (ví dụ: 8.8.8.8), nó sẽ chuyển dữ liệu đến <strong>Default Gateway</strong> (ví dụ: 192.168.1.1). Gateway sau đó sẽ chịu trách nhiệm định tuyến gói tin ra ngoài Internet.</li>
+            </ul>
+            <p><strong>Lưu ý quan trọng:</strong> Địa chỉ IP của Default Gateway <strong>phải nằm trong cùng mạng</strong> với thiết bị gửi. Nếu không, thiết bị sẽ không thể liên lạc được với Gateway – tức là không thể ra Internet.</p>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Vai trò của Default Gateway trong giao tiếp nội bộ và bên ngoài]</em></p>
+            </div>
             <h3>Static vs. Dynamic Routing</h3>
             <ul>
                 <li><strong>Static Routing:</strong> Người quản trị phải cấu hình đường đi thủ công. Phù hợp cho mạng nhỏ, đơn giản. Ví dụ lệnh trên router Cisco: `ip route 0.0.0.0 0.0.0.0 192.168.1.1` (gửi mọi traffic không xác định đến gateway 192.168.1.1).</li>
@@ -632,14 +739,36 @@
             </div>
         </div>
         <div class="section" id="step15">
-            <h2>Bước 15: Firewall Và Bảo Mật Mạng</h2>
-            <p>Firewall như tường lửa, kiểm soát lưu lượng dữ liệu vào/ra mạng, chặn các kết nối nguy hiểm dựa trên quy tắc (IP, port).</p>
-            <h3>Stateful vs. Stateless Firewall</h3>
+            <h2>Bước 15: Firewall (Tường Lửa) và Bảo Mật Mạng</h2>
+            <p>Sau khi thiết bị đã được bảo vệ một phần nhờ NAT (ẩn địa chỉ nội bộ sau Router), <strong>Firewall (Tường lửa)</strong> là lớp bảo vệ chủ động, kiểm soát lưu lượng ra vào mạng dựa trên các bộ quy tắc (rules) được thiết lập sẵn.</p>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Vị trí của Firewall giữa mạng nội bộ và Internet]</em></p>
+            </div>
+            <blockquote>🔑 <strong>Nguyên tắc mặc định:</strong>
             <ul>
-                <li><strong>Stateless:</strong> Kiểm tra từng gói tin một cách độc lập, không nhớ các kết nối trước đó. Nhanh nhưng kém an toàn.</li>
-                <li><strong>Stateful:</strong> Theo dõi trạng thái của các kết nối (ví dụ: TCP handshake). Chỉ cho phép các gói tin thuộc một kết nối hợp lệ đi qua. An toàn hơn nhưng tốn tài nguyên hơn.</li>
+                <li><strong>Chiều đi ra (outbound):</strong> Mở khá thoải mái – thiết bị nội bộ được tin tưởng.</li>
+                <li><strong>Chiều đi vào (inbound):</strong> Rất khắt khe – mặc định <strong>chặn tất cả</strong>, chỉ cho phép các kết nối phản hồi hoặc có “giấy phép” rõ ràng (Port Forwarding).</li>
             </ul>
-            <p><strong>Thứ tự luật rất quan trọng:</strong> Firewall xử lý luật từ trên xuống dưới và dừng lại ở luật đầu tiên khớp. Thường có một luật "Default Deny" ở cuối cùng để chặn mọi thứ không được cho phép rõ ràng.</p>
+            </blockquote>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Quy tắc Inbound (chặn) và Outbound (cho phép)]</em></p>
+            </div>
+            
+            <h3>Port Forwarding là gì?</h3>
+            <p><strong>Port Forwarding</strong> là một kỹ thuật cho phép thiết bị bên ngoài truy cập trực tiếp vào một dịch vụ bên trong mạng nội bộ. Khi cấu hình Port Forwarding, Router sẽ nhận gói tin từ Internet trên một cổng (port) cụ thể, và chuyển tiếp nó đến đúng thiết bị nội bộ (với IP và port tương ứng).</p>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Port Forwarding cho phép truy cập Web Server nội bộ từ Internet]</em></p>
+            </div>
+            
+            <h3>Tóm lược vai trò của NAT và Firewall</h3>
+            <table>
+                <thead><tr><th>Thành phần</th><th>Chức năng chính</th><th>Loại bảo vệ</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>NAT</strong></td><td>Dịch địa chỉ IP nội bộ → công cộng, và ngược lại</td><td><strong>Ẩn thiết bị nội bộ</strong>, phòng thủ bị động</td></tr>
+                    <tr><td><strong>Firewall</strong></td><td>Kiểm soát kết nối ra/vào theo quy tắc</td><td><strong>Ngăn chặn truy cập trái phép</strong>, phòng thủ chủ động</td></tr>
+                </tbody>
+            </table>
+            
             <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> Như bảo vệ cửa nhà, chỉ cho người quen vào, chặn kẻ lạ.</div>
             <h3>Sơ Đồ Minh Họa Động: Mô Phỏng Firewall Chặn Kết Nối</h3>
             <canvas id="firewallCanvas" width="600" height="400"></canvas>
@@ -660,7 +789,26 @@
         </div>
         <div class="section" id="step16">
             <h2>Bước 16: VPN - Virtual Private Network (Mạng Riêng Ảo)</h2>
-            <p>VPN tạo đường hầm an toàn qua internet, mã hóa dữ liệu, cho phép truy cập mạng từ xa như đang ở văn phòng.</p>
+            <p>VPN tạo một đường hầm an toàn qua internet, mã hóa dữ liệu, cho phép truy cập mạng từ xa như đang ở trong mạng công ty.</p>
+            
+            <h4>Trước khi có VPN</h4>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Kết nối không được bảo vệ, dữ liệu có thể bị chặn và đọc trộm]</em></p>
+            </div>
+            
+            <h4>Sau khi kết nối VPN</h4>
+             <table>
+                <thead><tr><th>Bước</th><th>Hành động</th><th>Mục đích</th></tr></thead>
+                <tbody>
+                    <tr><td>1. Mã hóa</td><td>Bọc dữ liệu lại bằng thuật toán bảo mật</td><td>Ngăn bị đọc trộm</td></tr>
+                    <tr><td>2. Gửi qua đường hầm</td><td>Truyền dữ liệu qua kênh riêng đến VPN Server</td><td>Bảo vệ trong suốt quá trình di chuyển</td></tr>
+                    <tr><td>3. Giải mã tại điểm cuối</td><td>Máy chủ VPN giải mã và chuyển tiếp dữ liệu</td><td>Truy cập dịch vụ Internet an toàn</td></tr>
+                </tbody>
+            </table>
+             <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: Luồng dữ liệu qua đường hầm VPN được mã hóa]</em></p>
+            </div>
+
              <h3>Các Loại VPN</h3>
             <ul>
                 <li><strong>Remote-Access VPN:</strong> Cho phép người dùng cá nhân kết nối vào mạng công ty.</li>
@@ -722,15 +870,19 @@
             </div>
         </div>
         <div class="section" id="step19">
-            <h2>Bước 19: Port Và Socket (Cửa Vào Ra Dữ Liệu)</h2>
-            <p>Port như số phòng trong tòa nhà (IP là địa chỉ tòa nhà). Socket là kết hợp IP + Port, giúp dữ liệu đến đúng ứng dụng (web port 80, email port 25).</p>
+            <h2>Bước 19: Port – Tổ Chức Giao Tiếp Bên Trong Thiết Bị</h2>
+            <p>Nếu máy tính như một <strong>tòa chung cư</strong>, thì <strong>Địa chỉ IP</strong> là địa chỉ của cả tòa nhà (ví dụ: `192.168.1.10`), và <strong>Port (Cổng)</strong> là số phòng của từng "căn hộ" bên trong – tức từng ứng dụng hoặc tiến trình đang sử dụng mạng.</p>
+            <blockquote>Mỗi ứng dụng đang hoạt động sẽ “ngồi” ở một port riêng, và dữ liệu từ Internet sẽ được gửi đến đúng port tương ứng.</blockquote>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ minh họa: IP là địa chỉ nhà, Port là số phòng]</em></p>
+            </div>
             <h3>Các Dải Port</h3>
             <ul>
                 <li><strong>0-1023 (Well-known Ports):</strong> Được dành riêng cho các dịch vụ hệ thống (HTTP: 80, FTP: 21, SSH: 22).</li>
                 <li><strong>1024-49151 (Registered Ports):</strong> Dành cho các ứng dụng của người dùng đã đăng ký.</li>
                 <li><strong>49152-65535 (Dynamic/Private/Ephemeral Ports):</strong> Được hệ điều hành sử dụng cho các kết nối đi ra ngoài (client-side).</li>
             </ul>
-            <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP là địa chỉ nhà, port là số phòng, socket là "nhà + phòng" để gửi thư đúng người.</div>
+            <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> IP là địa chỉ nhà, port là số phòng. Socket là kết hợp "nhà + phòng" để gửi thư đúng người.</div>
             <h3>Sơ Đồ Minh Họa Động: Dữ Liệu Đi Qua Port</h3>
             <canvas id="portCanvas" width="600" height="300"></canvas>
             <div class="interactive">
@@ -742,10 +894,45 @@
             </div>
         </div>
         <div class="section" id="step20">
-            <h2>Bước 20: TCP vs UDP - Giao Thức Truyền Dữ Liệu</h2>
-            <p>TCP an toàn, đáng tin cậy (như gọi điện xác nhận), UDP nhanh, không xác nhận (như gửi thư thường, dùng cho video/game).</p>
-            <p>Ngoài ra còn có các giao thức mới hơn như <strong>QUIC</strong> (dùng bởi HTTP/3), kết hợp tốc độ của UDP và độ tin cậy của TCP; và <strong>SCTP</strong>, dùng cho viễn thông (signaling).</p>
-            <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> TCP như chuyển phát nhanh có biên nhận, UDP như phát tờ rơi nhanh nhưng có thể mất.</div>
+            <h2>Bước 20: Giao Thức Truyền Tải: TCP và UDP</h2>
+            <p>Khi dữ liệu đã xác định được đích đến (qua IP và Port), câu hỏi tiếp theo là: <strong>Dữ liệu sẽ được gửi như thế nào?</strong> Lúc này, hai giao thức vận chuyển chính là <strong>TCP</strong> và <strong>UDP</strong> được sử dụng.</p>
+            
+             <table>
+                <thead>
+                    <tr>
+                        <th>Tiêu chí</th>
+                        <th>TCP (Transmission Control Protocol)</th>
+                        <th>UDP (User Datagram Protocol)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Đặc điểm</strong></td>
+                        <td>Hướng kết nối, đảm bảo thứ tự gói tin</td>
+                        <td>Không kết nối, gửi dữ liệu nhanh</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Độ tin cậy</strong></td>
+                        <td><strong>Cao:</strong> Có cơ chế bắt tay (handshake), xác nhận và truyền lại gói tin lỗi</td>
+                        <td><strong>Thấp:</strong> Không đảm bảo gói tin đến đích hoặc đúng thứ tự</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tốc độ</strong></td>
+                        <td>Chậm hơn do các bước kiểm tra</td>
+                        <td>Nhanh và nhẹ hơn</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ứng dụng</strong></td>
+                        <td>Web (HTTP/S), Email (SMTP), Truyền file (FTP)</td>
+                        <td>Video call, Game online, DNS, Live stream</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ so sánh TCP (cuộc gọi điện thoại) và UDP (bưu thiếp)]</em></p>
+            </div>
+            
+            <div class="analogy"><strong>Ví Dụ Đời Thường:</strong> TCP như chuyển phát nhanh có biên nhận và yêu cầu ký tên, UDP như gửi bưu thiếp - nhanh, gọn nhưng có thể thất lạc.</div>
             <h3>Sơ Đồ Minh Họa Động: So Sánh TCP/UDP</h3>
             <canvas id="tcpUdpCanvas" width="600" height="400"></canvas>
             <div class="interactive">
@@ -797,6 +984,52 @@
                 <button onclick="checkTotalQuiz()" aria-label="Check Comprehensive Quiz Answers">Kiểm Tra</button>
                 <div id="totalQuizResult" class="result-box"></div>
                 <div id="scoreHistoryChart"></div>
+            </div>
+        </div>
+
+        <div class="section" id="step23">
+            <h2>Bước 23: Tổng kết - Vòng đời của một gói tin</h2>
+            <p>Bây giờ chúng ta sẽ kết hợp tất cả các khái niệm đã học để theo dõi một hành động quen thuộc: <strong>Alice gửi tin nhắn "Hello" cho Bob qua WhatsApp.</strong></p>
+
+            <h3>Sơ đồ tổng quan – Quá trình thiết bị kết nối mạng từ A đến Z</h3>
+            <p>Khi một thiết bị (như laptop, điện thoại) kết nối vào mạng, có <strong>bốn thành phần cốt lõi</strong> cùng phối hợp để giúp thiết bị hoạt động bình thường:</p>
+            <ul>
+                <li><strong>DHCP (Dynamic Host Configuration Protocol) – <em>“Người phát số”</em>:</strong> Cấp IP, Subnet Mask, Gateway, DNS.</li>
+                <li><strong>IP Address & Subnet Mask – <em>“Địa chỉ nhà và bản đồ làng”</em>:</strong> Định danh thiết bị và xác định mạng nội bộ.</li>
+                <li><strong>Default Gateway – <em>“Người gác cổng làng”</em>:</strong> Cửa ngõ để ra ngoài Internet.</li>
+                <li><strong>DNS (Domain Name System) – <em>“Người phiên dịch”</em>:</strong> Dịch tên miền (ví dụ: `google.com`) thành địa chỉ IP.</li>
+            </ul>
+             <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ tổng quan: 4 thành phần cốt lõi khi kết nối mạng]</em></p>
+            </div>
+
+            <h3>Giai đoạn 1: Chuẩn bị & Tìm "Địa chỉ" (DHCP & DNS)</h3>
+            <p><strong>Mục tiêu:</strong> Trước khi có thể gửi bất cứ thứ gì, điện thoại của Alice phải có một danh tính trên mạng (IP) và phải biết địa chỉ của người nhận (IP máy chủ WhatsApp).</p>
+             <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ Giai đoạn 1: Thiết bị yêu cầu DHCP để lấy IP, sau đó dùng DNS để tìm IP của whatsapp.com]</em></p>
+            </div>
+            
+            <h3>Giai đoạn 2: Giao tiếp nội bộ (ARP & Gateway)</h3>
+            <p><strong>Mục tiêu:</strong> Tin nhắn đã sẵn sàng, nhưng để gửi nó ra ngoài Internet, trước tiên điện thoại của Alice phải gửi nó đến "cổng làng" (Default Gateway - Router). Để làm điều đó, nó cần biết địa chỉ vật lý (MAC) của Router.</p>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ Giai đoạn 2: Thiết bị gửi ARP Request để tìm MAC của Gateway, Gateway trả lời ARP Reply]</em></p>
+            </div>
+
+            <h3>Giai đoạn 3: Qua cổng an ninh ra thế giới (NAT & Firewall)</h3>
+            <p><strong>Mục tiêu:</strong> Gói tin đã đến Router. Bây giờ, Router phải "che giấu" địa chỉ IP nội bộ của Alice và gửi gói tin ra Internet một cách an toàn.</p>
+             <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ Giai đoạn 3: Router thực hiện NAT (thay IP private thành public) và kiểm tra qua Firewall]</em></p>
+            </div>
+            
+            <h3>Sơ đồ hoàn chỉnh: Bức tranh toàn cảnh</h3>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ tổng hợp: Toàn bộ vòng đời của một gói tin từ điện thoại Alice qua Router, Internet đến máy chủ WhatsApp]</em></p>
+            </div>
+            
+            <h3>Ứng dụng thực tế: Sơ đồ chẩn đoán lỗi mạng</h3>
+            <p>Khi bạn không vào được mạng, hãy thử tư duy theo luồng sau để xác định vấn đề:</p>
+            <div class="case-study" style="text-align:center; padding: 20px;">
+                <p><em>[Sơ đồ chẩn đoán lỗi mạng dạng flowchart]</em></p>
             </div>
         </div>
         
