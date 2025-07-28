@@ -1,4 +1,4 @@
-[![Website](https://img.shields.io/badge/Live_Demo-Click_Here-blue?style=for-the-badge&logo=google-chrome)](https://ngockhanhvd2812.github.io/network/)
+[![🌐 Xem Website](https://img.shields.io/badge/Live_Demo-Click_Here-orange?style=for-the-badge&logo=firefox-browser&logoColor=white)](https://ngockhanhvd2812.github.io/network/)
 
 # 🚀 Mô Hình Hóa IP và Subnet Mask
 
