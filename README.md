@@ -1,6 +1,6 @@
-# 🚀 Mô Hình Hóa IP và Subnet Mask
+[![Website](https://img.shields.io/badge/Live_Demo-Click_Here-blue?style=for-the-badge&logo=google-chrome)](https://ngockhanhvd2812.github.io/network/)
 
-[![Phiên bản](https://img.shields.io/badge/version-1.0.0-blue)]() [![Giấy phép](https://img.shields.io/badge/license-MIT-green)]()
+# 🚀 Mô Hình Hóa IP và Subnet Mask
 
 > **Từ người mới tìm hiểu đến chuyên gia mạng**  
 > Một trang bài giảng tương tác, minh hoạ trực quan giúp bạn nắm vững địa chỉ IP, Subnet Mask và toàn bộ khái niệm mạng qua **23 bước** từ cơ bản đến nâng cao.
